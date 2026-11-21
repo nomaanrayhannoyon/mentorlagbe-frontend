@@ -12,17 +12,34 @@ export const auth = betterAuth({
     minPasswordLength: 8,
   },
 
-  
-
-  // Persist the role chosen on the Sign Up form (student | tutor).
+  // Profile fields: the role chosen on Sign Up plus phone/bio, which are
+  // editable from the Update Profile page.
   user: {
     additionalFields: {
       role: {
         type: "string",
         required: false,
-        options:["student","tutor"],
+        options: ["student", "tutor"],
         input: true,
       },
+      phone: {
+        type: "string",
+        required: false,
+        defaultValue: "",
+        input: true,
+      },
+      bio: {
+        type: "string",
+        required: false,
+        defaultValue: "",
+        input: true,
+      },
+    },
+    // Allow changing the email from the Update Profile page. Email/password
+    // accounts are not verified, so the new address is applied immediately.
+    changeEmail: {
+      enabled: true,
+      updateEmailWithoutVerification: true,
     },
   },
 

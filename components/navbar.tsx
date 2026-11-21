@@ -2,11 +2,20 @@
 
 import { useSyncExternalStore, useState } from "react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
-import { ArrowRight, ChevronDown, Menu, Moon, Sun } from "lucide-react"
+import {
+  ArrowRight,
+  ChevronDown,
+  LogOut,
+  Menu,
+  Moon,
+  Sun,
+  UserCog,
+} from "lucide-react"
 
 import { cn } from "cn"
+import { authClient, type AuthUser } from "@/lib/auth-client"
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -88,6 +97,111 @@ function ThemeToggle() {
   )
 }
 
+function getInitials(name: string) {
+  const initials = name
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0))
+    .slice(0, 2)
+    .join("")
+  return initials.toUpperCase() || "?"
+}
+
+function Avatar({ user }: { user: AuthUser }) {
+  if (user.image) {
+    return (
+      <span className="size-9 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
+        {/* Profile pictures come from arbitrary OAuth providers. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={user.image} alt="" className="size-full object-cover" />
+      </span>
+    )
+  }
+
+  return (
+    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-burgundy-600 text-xs font-bold text-white ring-1 ring-border dark:bg-burgundy-700">
+      {getInitials(user.name)}
+    </span>
+  )
+}
+
+function useAuthUser() {
+  const { data } = authClient.useSession()
+  return data ? (data.user as AuthUser) : null
+}
+
+function useSignOut() {
+  const router = useRouter()
+
+  return async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/")
+          router.refresh()
+        },
+      },
+    })
+  }
+}
+
+function AccountMenu() {
+  const user = useAuthUser()
+  const signOut = useSignOut()
+
+  if (!user) {
+    return (
+      <div className="hidden items-center gap-2 lg:flex">
+        <Link
+          href="/sign-in"
+          className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
+        >
+          Sign In
+        </Link>
+        <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
+          Get Started
+          <ArrowRight />
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={`Account menu for ${user.name}`}
+        className="flex items-center gap-2 rounded-full border py-1 pr-2 pl-1 transition-colors hover:bg-muted"
+      >
+        <Avatar user={user} />
+        <span className="hidden max-w-28 truncate text-sm font-medium sm:inline">
+          {user.name}
+        </span>
+        <ChevronDown className="size-3.5 text-muted-foreground" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-52">
+        <div className="mb-1 border-b px-2.5 pt-1.5 pb-2">
+          <p className="truncate text-sm font-semibold">{user.name}</p>
+          <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+        </div>
+        <DropdownMenuItem
+          render={<Link href="/profile" />}
+          className="gap-2.5 px-2.5 py-2"
+        >
+          <UserCog className="text-muted-foreground" />
+          Update Profile
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => void signOut()}
+          className="gap-2.5 px-2.5 py-2"
+        >
+          <LogOut className="text-muted-foreground" />
+          Sign Out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
 function Wordmark() {
   return (
     <>
@@ -115,6 +229,8 @@ function mobileLinkClass(active: boolean) {
 export function Navbar() {
   const pathname = usePathname()
   const [sheetOpen, setSheetOpen] = useState(false)
+  const user = useAuthUser()
+  const signOut = useSignOut()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
@@ -178,18 +294,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <ThemeToggle />
 
-          <div className="hidden items-center gap-2 lg:flex">
-            <Link
-              href="/sign-in"
-              className={cn(buttonVariants({ size: "lg", variant: "outline" }))}
-            >
-              Sign In
-            </Link>
-            <Link href="/sign-up" className={buttonVariants({ size: "lg" })}>
-              Get Started
-              <ArrowRight />
-            </Link>
-          </div>
+          <AccountMenu />
 
           <div className="lg:hidden">
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -207,6 +312,14 @@ export function Navbar() {
                   <SheetDescription className="sr-only">
                     Navigation menu
                   </SheetDescription>
+                  {user && (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {user.name}
+                      <span className="block truncate text-xs">
+                        {user.email}
+                      </span>
+                    </p>
+                  )}
                 </SheetHeader>
 
                 <nav aria-label="Mobile" className="flex flex-col gap-1 px-4">
@@ -263,21 +376,46 @@ export function Navbar() {
                 </nav>
 
                 <SheetFooter className="border-t">
-                  <Link
-                    href="/sign-in"
-                    onClick={() => setSheetOpen(false)}
-                    className={cn(buttonVariants({ variant: "outline" }))}
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    onClick={() => setSheetOpen(false)}
-                    className={buttonVariants({})}
-                  >
-                    Get Started
-                    <ArrowRight />
-                  </Link>
+                  {user ? (
+                    <>
+                      <Link
+                        href="/profile"
+                        onClick={() => setSheetOpen(false)}
+                        className={cn(buttonVariants({ variant: "outline" }))}
+                      >
+                        Update Profile
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSheetOpen(false)
+                          void signOut()
+                        }}
+                        className={cn(buttonVariants({}))}
+                      >
+                        Sign Out
+                        <LogOut />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/sign-in"
+                        onClick={() => setSheetOpen(false)}
+                        className={cn(buttonVariants({ variant: "outline" }))}
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/sign-up"
+                        onClick={() => setSheetOpen(false)}
+                        className={buttonVariants({})}
+                      >
+                        Get Started
+                        <ArrowRight />
+                      </Link>
+                    </>
+                  )}
                 </SheetFooter>
               </SheetContent>
             </Sheet>
