@@ -147,7 +147,7 @@ function TuitionCard({ tuition }: { tuition: Tuition }) {
         </Link>
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-burgundy-600 dark:text-burgundy-400">
-            ৳{tuition.price.toLocaleString()}
+            ৳{(tuition.price ?? 0).toLocaleString()}
           </span>
           {tuition.tutorName && (
             <span className="truncate text-xs text-muted-foreground">

@@ -8,6 +8,11 @@ import StudentFeedback from "@/components/student-feedback"
 import { getCollection, Collections, type Tuition } from "@/lib/collections"
 import type { Tuition as ClientTuition } from "@/lib/types"
 
+/** Safely serialize a possibly-missing Date to an ISO string. */
+function toIso(value: Date | undefined): string {
+  return value ? new Date(value).toISOString() : new Date(0).toISOString()
+}
+
 /**
  * Server-rendered homepage. Fetches the latest approved tuitions from
  * MongoDB and passes them to the client card grid. Falls back to an empty
@@ -40,9 +45,10 @@ export default async function Page() {
       tutorId: "",
       tutorName: r.tutorName,
       status: r.status,
+      isActive: r.isActive,
       moderationNote: r.moderationNote,
-      createdAt: r.createdAt.toISOString(),
-      updatedAt: r.updatedAt.toISOString(),
+      createdAt: toIso(r.createdAt),
+      updatedAt: toIso(r.updatedAt),
     }))
   } catch (err) {
     // During `next build` the DB may not be reachable; the page still

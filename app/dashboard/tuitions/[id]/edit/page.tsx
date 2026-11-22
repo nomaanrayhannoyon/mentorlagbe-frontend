@@ -23,9 +23,14 @@ function toClient(t: Tuition): ClientTuition {
     tutorId: t.tutorId,
     tutorName: t.tutorName,
     status: t.status,
+    isActive: t.isActive,
     moderationNote: t.moderationNote,
-    createdAt: t.createdAt.toISOString(),
-    updatedAt: t.updatedAt.toISOString(),
+    createdAt: t.createdAt
+      ? new Date(t.createdAt).toISOString()
+      : new Date(0).toISOString(),
+    updatedAt: t.updatedAt
+      ? new Date(t.updatedAt).toISOString()
+      : new Date(0).toISOString(),
   }
 }
 

@@ -153,7 +153,7 @@ export default async function TuitionDetailPage({
               <div>
                 <p className="text-sm text-muted-foreground">Monthly fee</p>
                 <p className="text-3xl font-extrabold text-burgundy-600 dark:text-burgundy-400">
-                  ৳{tuition.price.toLocaleString()}
+                  ৳{(tuition.price ?? 0).toLocaleString()}
                 </p>
               </div>
 
