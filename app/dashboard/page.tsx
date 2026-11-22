@@ -14,7 +14,7 @@ import type { LucideIcon } from "lucide-react"
 import { requireRole } from "@/lib/authHelper"
 import { getCollection, Collections } from "@/lib/collections"
 import { Card } from "@/components/ui/card"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 export const metadata = { title: "Dashboard" }
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
   const userId = session.user.id
 
   let stats: StatCard[] = []
-  let greeting = "Welcome back"
+  const greeting = "Welcome back"
 
   if (role === "student") {
     const apps = await getCollection(Collections.applications)
@@ -57,8 +57,18 @@ export default async function DashboardPage() {
       bms.countDocuments({ userId }),
     ])
     stats = [
-      { label: "My applications", value: appCount, icon: ClipboardList, href: "/dashboard/applications" },
-      { label: "Saved tuitions", value: bmCount, icon: Bookmark, href: "/dashboard/bookmarks" },
+      {
+        label: "My applications",
+        value: appCount,
+        icon: ClipboardList,
+        href: "/dashboard/applications",
+      },
+      {
+        label: "Saved tuitions",
+        value: bmCount,
+        icon: Bookmark,
+        href: "/dashboard/bookmarks",
+      },
     ]
   } else if (role === "tutor") {
     const tuitions = await getCollection(Collections.tuitions)
@@ -78,9 +88,19 @@ export default async function DashboardPage() {
       }),
     ])
     stats = [
-      { label: "My tuitions", value: tutorTuitionCount, icon: GraduationCap, href: "/dashboard/tuitions" },
+      {
+        label: "My tuitions",
+        value: tutorTuitionCount,
+        icon: GraduationCap,
+        href: "/dashboard/tuitions",
+      },
       { label: "Awaiting approval", value: pendingCount, icon: ShieldCheck },
-      { label: "Applications", value: appCount, icon: ClipboardList, href: "/dashboard/applications" },
+      {
+        label: "Applications",
+        value: appCount,
+        icon: ClipboardList,
+        href: "/dashboard/applications",
+      },
     ]
   } else {
     const tuitions = await getCollection(Collections.tuitions)
@@ -94,8 +114,18 @@ export default async function DashboardPage() {
         apps.countDocuments({}),
       ])
     stats = [
-      { label: "Pending review", value: pendingTuitions, icon: ShieldCheck, href: "/dashboard/admin/tuitions" },
-      { label: "Total users", value: totalUsers, icon: Users, href: "/dashboard/admin/users" },
+      {
+        label: "Pending review",
+        value: pendingTuitions,
+        icon: ShieldCheck,
+        href: "/dashboard/admin/tuitions",
+      },
+      {
+        label: "Total users",
+        value: totalUsers,
+        icon: Users,
+        href: "/dashboard/admin/users",
+      },
       { label: "Total tuitions", value: totalTuitions, icon: GraduationCap },
       { label: "Total applications", value: totalApps, icon: ClipboardList },
     ]

@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation"
-import Link from "next/link"
 import {
   LayoutDashboard,
   Search,
@@ -34,7 +32,11 @@ const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
     { href: "/tuitions", label: "Browse Tuitions", icon: Search },
     { href: "/dashboard/bookmarks", label: "Saved Tuitions", icon: Bookmark },
-    { href: "/dashboard/applications", label: "My Applications", icon: ClipboardList },
+    {
+      href: "/dashboard/applications",
+      label: "My Applications",
+      icon: ClipboardList,
+    },
     { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
     { href: "/profile", label: "Profile", icon: Settings },
   ],
@@ -42,13 +44,21 @@ const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
     { href: "/dashboard/tuitions", label: "My Tuitions", icon: GraduationCap },
     { href: "/dashboard/tuitions/new", label: "Post a Tuition", icon: Plus },
-    { href: "/dashboard/applications", label: "Applications", icon: ClipboardList },
+    {
+      href: "/dashboard/applications",
+      label: "Applications",
+      icon: ClipboardList,
+    },
     { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
     { href: "/profile", label: "Profile", icon: Settings },
   ],
   admin: [
     { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-    { href: "/dashboard/admin/tuitions", label: "Moderation", icon: ShieldCheck },
+    {
+      href: "/dashboard/admin/tuitions",
+      label: "Moderation",
+      icon: ShieldCheck,
+    },
     { href: "/dashboard/admin/users", label: "Users", icon: Users },
     { href: "/profile", label: "Profile", icon: Settings },
   ],

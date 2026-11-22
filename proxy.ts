@@ -3,48 +3,20 @@ import { NextResponse, type NextRequest } from "next/server"
 /**
  * Route protection via better-auth session verification.
  *
- * The session token lives in an httpOnly cookie. In middleware we forward
- * the request headers to better-auth's get-session endpoint, which validates
- * the signed token against the backing session record. This is the
- * authoritative server-side verification (the "JWT verification" step): the
- * cookie is a signed JWT, and better-auth checks its signature + the DB
- * session it points to.
+ * Protected prefixes (dashboard, profile) require a session cookie; the proxy
+ * gates them before render and redirects anonymous users to sign-in. API
+ * routes under /api (except /api/auth) return 401 JSON.
  *
- * Middleware runs on the Node.js runtime (Next 16) so it can use the shared
- * Mongo connection pool.
+ * Proxy always runs on the Node.js runtime (Next 16).
  */
 
-export const runtime = "nodejs"
-
-const PUBLIC_PATHS = [
-  "/",
-  "/sign-in",
-  "/sign-up",
-  "/forgot-password",
-  "/reset-password",
-  "/about",
-  "/pricing",
-  "/tuitions",
-  "/api/auth",
-]
-
 const PROTECTED_PREFIXES = ["/dashboard", "/profile"]
-
-function isPublic(pathname: string) {
-  return (
-    PUBLIC_PATHS.some(
-      (p) => p === pathname || (p !== "/" && pathname.startsWith(p + "/"))
-    ) ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/images")
-  )
-}
 
 function isProtected(pathname: string) {
   return PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
 
   if (!isProtected(pathname)) {

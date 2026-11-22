@@ -11,8 +11,7 @@ import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 
 const roleBadgeClass: Record<Role, string> = {
-  student:
-    "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+  student: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
   tutor:
     "border-burgundy-500/30 bg-burgundy-500/10 text-burgundy-700 dark:text-burgundy-400",
   admin:
@@ -29,9 +28,7 @@ export function UsersList() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await apiFetch<{ users: UserProfile[] }>(
-        "/api/admin/users"
-      )
+      const data = await apiFetch<{ users: UserProfile[] }>("/api/admin/users")
       setUsers(data.users)
     } catch (err) {
       toast.error(

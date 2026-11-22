@@ -10,6 +10,8 @@ import {
   ArrowRight,
 } from "lucide-react"
 
+import { CheckoutButton } from "@/components/payments/checkout-button"
+
 const plans = {
   student: [
     {
@@ -191,17 +193,19 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              <Link
-                href={`/sign-up?role=${activeTab}&plan=${isPro ? "pro" : "free"}`}
-                className={`mt-9 flex items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-bold transition-all ${
-                  isPro
-                    ? "bg-red-600 text-white hover:bg-red-700"
-                    : "border border-gray-200 text-gray-900 hover:border-red-500 hover:text-red-600"
-                }`}
-              >
-                {isPro ? "Get Pro Plan" : "Get Started Free"}
-                <ArrowRight size={17} />
-              </Link>
+              {isPro ? (
+                <div className="mt-9">
+                  <CheckoutButton plan="pro" label="Get Pro Plan" />
+                </div>
+              ) : (
+                <Link
+                  href={`/sign-up?role=${activeTab}&plan=free`}
+                  className="mt-9 flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-6 py-4 text-sm font-bold text-gray-900 transition-all hover:border-red-500 hover:text-red-600"
+                >
+                  Get Started Free
+                  <ArrowRight size={17} />
+                </Link>
+              )}
             </div>
           )
         })}

@@ -81,9 +81,7 @@ export function ModerationList() {
       setRejectNote("")
       await load()
     } catch (err) {
-      toast.error(
-        err instanceof ApiError ? err.message : "Review failed."
-      )
+      toast.error(err instanceof ApiError ? err.message : "Review failed.")
     } finally {
       setBusyId(null)
     }
@@ -173,7 +171,9 @@ export function ModerationList() {
                             size="sm"
                             variant="destructive"
                             disabled={busyId === tuition._id}
-                            onClick={() => review(tuition, "rejected", rejectNote)}
+                            onClick={() =>
+                              review(tuition, "rejected", rejectNote)
+                            }
                           >
                             Confirm reject
                           </Button>

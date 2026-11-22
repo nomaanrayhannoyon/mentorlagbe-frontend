@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, FormEvent } from "react"
+import { useState, FormEvent, Suspense } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { authClient } from "@/lib/auth-client"
 import {
   User,
@@ -19,9 +19,28 @@ import {
 } from "lucide-react"
 
 export default function SignupPage() {
-  const router = useRouter()
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center text-muted-foreground">
+          Loading…
+        </main>
+      }
+    >
+      <SignupForm />
+    </Suspense>
+  )
+}
 
-  const [role, setRole] = useState<"student" | "tutor">("student")
+function SignupForm() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Pre-fill role from ?role= and remember the chosen plan from ?plan=.
+  const initialRole = searchParams.get("role") === "tutor" ? "tutor" : "student"
+  const plan = searchParams.get("plan")
+
+  const [role, setRole] = useState<"student" | "tutor">(initialRole)
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
@@ -280,6 +299,13 @@ export default function SignupPage() {
                   </button>
                 </div>
               </div>
+
+              {plan === "pro" && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-400">
+                  You selected the <strong>Pro</strong> plan. You can upgrade
+                  after creating your account.
+                </div>
+              )}
 
               {/* Role Selection */}
               <div>

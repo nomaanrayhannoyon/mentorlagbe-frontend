@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, type FormEvent } from "react"
+import { useState, type FormEvent, Suspense } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import {
   Mail,
   Lock,
@@ -15,8 +15,25 @@ import {
 } from "lucide-react"
 import { authClient } from "@/lib/auth-client"
 
-function SigninPage() {
+export default function SigninPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center text-muted-foreground">
+          Loading…
+        </main>
+      }
+    >
+      <SigninForm />
+    </Suspense>
+  )
+}
+
+function SigninForm() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -41,7 +58,7 @@ function SigninPage() {
         email,
         password,
         rememberMe,
-        callbackURL: "/",
+        callbackURL: callbackUrl,
       })
 
       if (error) {
@@ -49,7 +66,7 @@ function SigninPage() {
         return
       }
 
-      router.push("/dashboard")
+      router.push(callbackUrl)
       router.refresh()
     } catch {
       setError("Something went wrong. Please try again.")
@@ -64,7 +81,7 @@ function SigninPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: callbackUrl,
       })
     } catch {
       setError("Google sign in failed. Please try again.")
@@ -315,5 +332,3 @@ function SigninPage() {
     </main>
   )
 }
-
-export default SigninPage

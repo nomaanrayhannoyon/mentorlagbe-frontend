@@ -61,11 +61,7 @@ export function DeleteTuitionDialog({
             onClick={handleDelete}
             disabled={deleting}
           >
-            {deleting ? (
-              <Loader2 className="size-4 animate-spin" />
-            ) : (
-              "Delete"
-            )}
+            {deleting ? <Loader2 className="size-4 animate-spin" /> : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

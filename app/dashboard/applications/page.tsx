@@ -14,7 +14,9 @@ export default async function ApplicationsPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-          {mode === "tutor" ? "Applications to your tuitions" : "My applications"}
+          {mode === "tutor"
+            ? "Applications to your tuitions"
+            : "My applications"}
         </h1>
         <p className="mt-1 text-muted-foreground">
           {mode === "tutor"

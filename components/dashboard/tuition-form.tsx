@@ -26,14 +26,7 @@ const SUBJECTS = [
   "IELTS",
 ]
 
-const LEVELS = [
-  "Class 6-8",
-  "Class 9",
-  "Class 10",
-  "SSC",
-  "HSC",
-  "University",
-]
+const LEVELS = ["Class 6-8", "Class 9", "Class 10", "SSC", "HSC", "University"]
 
 const inputClass =
   "h-10 rounded-lg border border-input bg-transparent px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -131,7 +124,9 @@ export function TuitionForm({ tuition }: Props) {
         toast.success("Tuition updated and sent for re-approval.")
       } else {
         await apiFetch("/api/tuitions", { method: "POST", body })
-        toast.success("Tuition posted. It will appear once approved by an admin.")
+        toast.success(
+          "Tuition posted. It will appear once approved by an admin."
+        )
       }
 
       router.push("/dashboard/tuitions")
@@ -344,7 +339,10 @@ export function TuitionForm({ tuition }: Props) {
         )}
 
         <div className="flex items-center justify-end gap-3 pt-2">
-          <Link href="/dashboard/tuitions" className={cn(buttonVariants({ variant: "outline" }))}>
+          <Link
+            href="/dashboard/tuitions"
+            className={cn(buttonVariants({ variant: "outline" }))}
+          >
             Cancel
           </Link>
           <Button type="submit" disabled={saving || uploading}>

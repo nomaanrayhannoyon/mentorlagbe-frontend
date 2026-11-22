@@ -8,8 +8,7 @@ const roleLabel: Record<Role, string> = {
 }
 
 const roleBadgeClass: Record<Role, string> = {
-  student:
-    "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+  student: "border-blue-500/30 bg-blue-500/10 text-blue-700 dark:text-blue-400",
   tutor:
     "border-burgundy-500/30 bg-burgundy-500/10 text-burgundy-700 dark:text-burgundy-400",
   admin:
@@ -59,10 +58,7 @@ export function DashboardUserCard({
           <p className="truncate text-xs text-muted-foreground">{email}</p>
         </div>
       </div>
-      <Badge
-        variant="outline"
-        className={`mt-3 w-fit ${roleBadgeClass[role]}`}
-      >
+      <Badge variant="outline" className={`mt-3 w-fit ${roleBadgeClass[role]}`}>
         {roleLabel[role]}
       </Badge>
     </div>

@@ -100,12 +100,11 @@ export function TutorTuitionsList() {
                   {tuition.subject} · {tuition.level} · {tuition.mode} · ৳
                   {tuition.price}
                 </p>
-                {tuition.status === "rejected" &&
-                  tuition.moderationNote && (
-                    <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                      Note from admin: {tuition.moderationNote}
-                    </p>
-                  )}
+                {tuition.status === "rejected" && tuition.moderationNote && (
+                  <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                    Note from admin: {tuition.moderationNote}
+                  </p>
+                )}
               </div>
 
               <div className="flex shrink-0 gap-2">

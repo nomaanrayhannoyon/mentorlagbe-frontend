@@ -10,7 +10,6 @@ import type { Application, Tuition } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 
 const statusVariant: Record<
   Application["status"],
@@ -40,16 +39,12 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const data = await apiFetch<{ items: Application[] }>(
-        "/api/applications"
-      )
+      const data = await apiFetch<{ items: Application[] }>("/api/applications")
       setApps(data.items)
 
       // If tutor, fetch tuitions to render titles.
       if (mode === "tutor" && data.items.length > 0) {
-        const mine = await apiFetch<{ items: Tuition[] }>(
-          "/api/tuitions/mine"
-        )
+        const mine = await apiFetch<{ items: Tuition[] }>("/api/tuitions/mine")
         const map: Record<string, Tuition> = {}
         for (const t of mine.items) map[t._id] = t
         setTuitions(map)
@@ -67,7 +62,10 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
     void load()
   }, [load])
 
-  const act = async (app: Application, action: "accept" | "reject" | "withdraw") => {
+  const act = async (
+    app: Application,
+    action: "accept" | "reject" | "withdraw"
+  ) => {
     setBusyId(app._id)
     try {
       await apiFetch(`/api/applications/${app._id}`, {
@@ -83,9 +81,7 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
       )
       await load()
     } catch (err) {
-      toast.error(
-        err instanceof ApiError ? err.message : "Action failed."
-      )
+      toast.error(err instanceof ApiError ? err.message : "Action failed.")
     } finally {
       setBusyId(null)
     }

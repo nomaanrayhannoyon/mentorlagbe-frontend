@@ -60,7 +60,10 @@ export function BookmarksList() {
         <p className="text-sm text-muted-foreground">
           Tap the bookmark on any tuition to save it here.
         </p>
-        <Link href="/tuitions" className={cn(buttonVariants({ variant: "outline" }), "mt-2")}>
+        <Link
+          href="/tuitions"
+          className={cn(buttonVariants({ variant: "outline" }), "mt-2")}
+        >
           Browse tuitions
         </Link>
       </Card>
