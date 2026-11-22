@@ -11,6 +11,8 @@ import {
 } from "lucide-react"
 
 import { CheckoutButton } from "@/components/payments/checkout-button"
+import { authClient } from "@/lib/auth-client"
+import { Button } from "@/components/ui/button"
 
 const plans = {
   student: [
@@ -69,6 +71,10 @@ const plans = {
 
 export default function PricingPage() {
   const [activeTab, setActiveTab] = useState<"student" | "tutor">("student")
+  const { data: session } = authClient.useSession()
+  const currentPlan =
+    (session?.user as { plan?: "free" | "pro" } | undefined)?.plan ?? "free"
+  const isPro = currentPlan === "pro"
 
   const currentPlans = plans[activeTab]
 
@@ -120,9 +126,22 @@ export default function PricingPage() {
       </div>
 
       <p className="mt-5 text-center text-sm text-gray-500">
-        {activeTab === "student"
-          ? "Plans designed for students and learners."
-          : "Plans designed for tutors and mentors."}
+        {session ? (
+          <>
+            You are on the{" "}
+            <span className="font-semibold text-red-600">
+              {isPro ? "Pro" : "Free"}
+            </span>{" "}
+            plan.{" "}
+            {activeTab === "student"
+              ? "Plans designed for students and learners."
+              : "Plans designed for tutors and mentors."}
+          </>
+        ) : activeTab === "student" ? (
+          "Plans designed for students and learners."
+        ) : (
+          "Plans designed for tutors and mentors."
+        )}
       </p>
 
       {/* Pricing Cards */}
@@ -195,7 +214,13 @@ export default function PricingPage() {
 
               {isPro ? (
                 <div className="mt-9">
-                  <CheckoutButton plan="pro" label="Get Pro Plan" />
+                  {session && currentPlan === "pro" ? (
+                    <Button disabled className="w-full">
+                      Current plan
+                    </Button>
+                  ) : (
+                    <CheckoutButton plan="pro" label="Get Pro Plan" />
+                  )}
                 </div>
               ) : (
                 <Link
