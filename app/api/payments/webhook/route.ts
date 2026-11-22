@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server"
 import type Stripe from "stripe"
 import { getStripe } from "@/lib/stripe"
-import { getCollection, Collections, type Payment } from "@/lib/collections"
+import {
+  getCollection,
+  Collections,
+  type Payment,
+  type UserDocument,
+} from "@/lib/collections"
+import { ObjectId } from "mongodb"
 
 /**
  * POST /api/payments/webhook
@@ -64,7 +70,16 @@ export async function POST(request: Request) {
             { upsert: true }
           )
         }
-        void userId
+        // Upgrade the user to the Pro plan. This is the ONLY place plan is
+        // changed — never trust the client.
+        if (userId && /^[a-f0-9]{24}$/i.test(userId)) {
+          await (
+            await getCollection<UserDocument>(Collections.users)
+          ).updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { plan: "pro", updatedAt: new Date() } }
+          )
+        }
         break
       }
       case "checkout.session.async_payment_failed": {
@@ -85,6 +100,16 @@ export async function POST(request: Request) {
           { stripeSessionId: sub.id },
           { $set: { status: "refunded" } }
         )
+        // Downgrade the user back to free when their subscription ends.
+        const userId = sub.metadata?.userId
+        if (userId && /^[a-f0-9]{24}$/i.test(userId)) {
+          await (
+            await getCollection<UserDocument>(Collections.users)
+          ).updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: { plan: "free", updatedAt: new Date() } }
+          )
+        }
         break
       }
       default:
