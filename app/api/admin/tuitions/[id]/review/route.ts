@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getCollection, Collections, type Tuition } from "@/lib/collections"
-import { requireApiRole } from "@/lib/authHelper"
+import { verifyAdmin } from "@/lib/authHelper"
 import { toObjectId, jsonError } from "@/lib/api"
 
 /**
@@ -20,7 +20,7 @@ const reviewSchema = z.object({
 })
 
 export async function POST(request: Request, context: ReviewContext) {
-  const auth = await requireApiRole("admin")
+  const auth = await verifyAdmin()
   if (!auth.ok) return jsonError(auth.error, auth.status)
 
   const { id } = await context.params

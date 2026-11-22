@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getCollection, Collections, type Role } from "@/lib/collections"
-import { requireApiRole } from "@/lib/authHelper"
+import { verifyAdmin } from "@/lib/authHelper"
 import { jsonError, toObjectId } from "@/lib/api"
 
 /**
@@ -9,7 +9,7 @@ import { jsonError, toObjectId } from "@/lib/api"
  * Admin-only: list all users (profile fields only, never passwordHash).
  */
 export async function GET() {
-  const auth = await requireApiRole("admin")
+  const auth = await verifyAdmin()
   if (!auth.ok) return jsonError(auth.error, auth.status)
 
   const col = await getCollection<Record<string, unknown>>(Collections.users)
@@ -53,7 +53,7 @@ const patchSchema = z.object({
  * Admin-only: change a user's role. Cannot demote the last admin (self).
  */
 export async function PATCH(request: Request) {
-  const auth = await requireApiRole("admin")
+  const auth = await verifyAdmin()
   if (!auth.ok) return jsonError(auth.error, auth.status)
 
   let body: unknown

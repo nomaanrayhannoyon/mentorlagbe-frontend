@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import type { Filter } from "mongodb"
 import { getCollection, Collections, type Tuition } from "@/lib/collections"
-import { requireApiRole } from "@/lib/authHelper"
+import { verifyAdmin } from "@/lib/authHelper"
 import { jsonError } from "@/lib/api"
 
 /**
@@ -14,7 +14,7 @@ import { jsonError } from "@/lib/api"
  * provides the list endpoint so both verbs are reachable.
  */
 export async function GET(request: Request) {
-  const auth = await requireApiRole("admin")
+  const auth = await verifyAdmin()
   if (!auth.ok) return jsonError(auth.error, auth.status)
 
   const { searchParams } = new URL(request.url)
