@@ -2,7 +2,14 @@
 
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import { Plus, Pencil, Trash2, Loader2, GraduationCap } from "lucide-react"
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Loader2,
+  GraduationCap,
+  Power,
+} from "lucide-react"
 import { toast } from "sonner"
 
 import { apiFetch, ApiError } from "@/lib/api-client"
@@ -57,6 +64,23 @@ export function TutorTuitionsList() {
     void load()
   }
 
+  const handleToggleActive = async (tuition: Tuition) => {
+    try {
+      await apiFetch(`/api/tuitions/${tuition._id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ isActive: tuition.isActive === false }),
+      })
+      toast.success(
+        tuition.isActive === false ? "Tuition reopened." : "Tuition closed."
+      )
+      void load()
+    } catch (err) {
+      toast.error(
+        err instanceof ApiError ? err.message : "Could not update tuition."
+      )
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-16 text-muted-foreground">
@@ -95,6 +119,10 @@ export function TutorTuitionsList() {
                   <Badge variant={statusVariant[tuition.status]}>
                     {statusLabel[tuition.status]}
                   </Badge>
+                  {tuition.status === "approved" &&
+                    tuition.isActive === false && (
+                      <Badge variant="outline">Closed</Badge>
+                    )}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {tuition.subject} · {tuition.level} · {tuition.mode} · ৳
@@ -108,6 +136,16 @@ export function TutorTuitionsList() {
               </div>
 
               <div className="flex shrink-0 gap-2">
+                {tuition.status === "approved" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleToggleActive(tuition)}
+                  >
+                    <Power className="size-4" />
+                    {tuition.isActive === false ? "Reopen" : "Close"}
+                  </Button>
+                )}
                 <Link
                   href={`/dashboard/tuitions/${tuition._id}/edit`}
                   className={cn(
