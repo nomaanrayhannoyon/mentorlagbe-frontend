@@ -26,7 +26,7 @@ const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL
 
 // Extra origins (comma-separated) that are allowed to call the auth API,
 // e.g. a separately hosted frontend. The base URL is always trusted.
-const TRUSTED_ORIGINS = (process.env.TRUSTED_ORIGINS ?? "")
+const TRUSTED_ORIGINS = (process.env.TRUSTED_ORIGINS ?? process.env.CORS_ALLOWED_ORIGIN ?? "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean)
