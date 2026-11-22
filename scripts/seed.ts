@@ -10,6 +10,8 @@
  * already exist for the same title+tutorId.
  */
 
+import "dotenv/config"
+
 import { getDb } from "@/lib/db"
 import {
   Collections,

@@ -11,27 +11,41 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## Commands
 
 - Package manager: **npm** (`package-lock.json` is the lockfile).
-- `npm run dev` / `npm run build` / `npm run start` — standard Next.js.
-- Verify changes with, in order: `npm run format` → `npm run lint` → `npm run typecheck`.
-- **There is no test runner and no CI config.** Don't guess a test command; these three are the entire verification suite.
+- Verify changes with, in order: `npm run format` → `npm run lint` → `npm run typecheck` → `npm run build`.
+- **No test runner and no CI config exist.** Don't guess a test command; those four are the entire verification suite.
+- `npm run seed` — demo data (accounts documented in README). Other DB helpers are *not* npm scripts: `npx tsx scripts/verify-db.ts` (safe, prints collection counts) and `npx tsx scripts/cleanup-legacy.ts` (**destructive** — drops legacy `user`/`session`/`bookmarks` collections; dev DB only).
 - Add shadcn components with `npx shadcn@latest add <component>` (lands in `components/ui/`).
 
 ## Stack quirks (differs from defaults)
 
 - Next 16.4.5 + React 19.3.1, App Router only (`app/`). Path alias `@/*` → repo root.
+- Route protection lives in **`proxy.ts`**, not `middleware.ts` — Next 16 renames the convention and the export must be named `proxy`. It only checks session-cookie *presence*; real auth runs in pages/route handlers.
 - Tailwind **v4** via `@tailwindcss/postcss`; there is no `tailwind.config`. Theme tokens live in `app/globals.css` (`@theme inline`, imports `shadcn/tailwind.css`).
 - shadcn style is `base-nova`: UI primitives come from **`@base-ui/react`, not Radix**. Don't write Radix-based components.
 - `cn` is the `cn` npm package re-exported from `lib/utils.ts` — not the usual clsx + tailwind-merge combo.
-- Prettier config is opinionated: **no semicolons, double quotes, LF**, Tailwind class sorting via `prettier-plugin-tailwindcss`. Run `npm run format` instead of hand-matching style.
+- Prettier config is opinionated: **no semicolons, double quotes, LF**, Tailwind class sorting via `prettier-plugin-tailwindcss`. Run `npm run format` instead of hand-matching style (it only covers `ts`/`tsx`).
 
-## Auth (better-auth + MongoDB)
+## Env loading (gotcha)
 
-- Server config: `lib/auth.ts`. All better-auth endpoints are mounted through the catch-all at `app/api/auth/[...all]/route.ts` — don't add per-endpoint routes.
-- MongoDB is hardcoded to `mongodb://localhost:27017`, db `mentorlagbe`: a local Mongo must be running for auth to work.
-- `.env` (gitignored) contains `BETTER_AUTH_SECRET` and `BETTER_AUTH_URL`. Google login reads `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`, which are referenced in `lib/auth.ts` but not yet present — add them before enabling it.
-- `lib/auth-client.ts` creates **two** clients: `authClient` uses the `baseURL`, but the exported `signIn` / `signUp` / `useSession` come from a second instance without it. Pick deliberately when importing.
+- Keep secrets in **`.env`**, not just `.env.local`: Next reads `.env`, but `scripts/*.ts` load it via `dotenv/config`, which reads *only* `.env`. README's `cp .env.example .env.local` works for the app but breaks `npm run seed`.
+- `dotenv` is not a declared dependency — it resolves only through npm hoisting from `shadcn`. Don't remove `shadcn` from `dependencies` (it's the component CLI, not just a library).
+- Required: `MONGODB_URI` — `lib/db.ts` **throws at import time** when it's missing. Optional: `MONGODB_DB` (defaults to `mentorlagbe`).
+- Integration keys are present but **empty** in `.env`, deliberately: Stripe returns 503 (`STRIPE_ENABLED`), ImgBB returns a typed 503, Google OAuth omits `socialProviders` entirely. Keep these features env-gated; don't turn missing keys into hard failures.
+
+## Auth & data model (better-auth + MongoDB)
+
+- Server config: `lib/auth.ts`. All better-auth endpoints mount through the catch-all at `app/api/auth/[...all]/route.ts` — don't add per-endpoint routes.
+- `usePlural: true` → auth collections are **`users`, `sessions`, `accounts`, `verifications`** (plural). README's Database table saying `user` is stale; trust `lib/collections.ts`.
+- Role guards in `lib/authHelper.ts`: pages/components use `requireSession` / `requireRole` (redirect on failure); API routes use `requireApiRole` / `getApiSession` (return a 401/403 `VerifyResult`).
+- `lib/auth-client.ts` creates a **single** client (configured with `baseURL`); `signIn` / `signUp` / `useSession` are destructured from it.
+
+## Assignment constraints — don't "fix" these
+
+- Exactly **four** domain collections; bookmarks live on `users.savedTuitions`. Do not add a fifth collection.
+- `usePlural: true` and the named guards `verifyStudent` / `verifyTutor` / `verifyAdmin` are required by the assignment brief — they look redundant but are graded.
 
 ## Repo facts
 
 - `CLAUDE.md` is just `@AGENTS.md` — keep all guidance in this file, don't duplicate.
-- The `nextjs-agent-rules` block above is regenerated by `next dev`; leave it intact in diffs.
+- The `nextjs-agent-rules` block above is regenerated by `next dev` (`agentRules: false` in `next.config.ts` disables it); leave it intact in diffs.
+- README is stale in three places: `.env.local` setup, the singular `user` collection, and an "auxiliary bookmarks collection". When README and code disagree, trust code.
