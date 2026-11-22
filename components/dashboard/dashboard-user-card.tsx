@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import type { Role } from "@/lib/types"
 
@@ -33,15 +34,20 @@ export function DashboardUserCard({
   role,
   plan,
   image,
+  href = "/profile",
 }: {
   name: string
   email: string
   role: Role
   plan?: "free" | "pro"
   image?: string | null
+  href?: string
 }) {
   return (
-    <div className="rounded-2xl border bg-card p-4 shadow-sm">
+    <Link
+      href={href}
+      className="block rounded-2xl border bg-card p-4 shadow-sm transition-colors hover:border-burgundy-300 dark:hover:border-burgundy-800"
+    >
       <div className="flex items-center gap-3">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -77,6 +83,6 @@ export function DashboardUserCard({
           </Badge>
         )}
       </div>
-    </div>
+    </Link>
   )
 }
