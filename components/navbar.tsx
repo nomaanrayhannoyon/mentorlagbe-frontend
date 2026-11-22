@@ -7,6 +7,7 @@ import { useTheme } from "next-themes"
 import {
   ArrowRight,
   ChevronDown,
+  LayoutDashboard,
   LogOut,
   Menu,
   Moon,
@@ -166,6 +167,10 @@ function AccountMenu() {
     )
   }
 
+  // Role-specific dashboard URL. Falls back to the generic dashboard if the
+  // role is somehow missing.
+  const dashboardHref = `/dashboard/${user.role ?? "student"}`
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -183,6 +188,13 @@ function AccountMenu() {
           <p className="truncate text-sm font-semibold">{user.name}</p>
           <p className="truncate text-xs text-muted-foreground">{user.email}</p>
         </div>
+        <DropdownMenuItem
+          render={<Link href={dashboardHref} />}
+          className="gap-2.5 px-2.5 py-2 font-medium"
+        >
+          <LayoutDashboard className="text-burgundy-600 dark:text-burgundy-400" />
+          Dashboard
+        </DropdownMenuItem>
         <DropdownMenuItem
           render={<Link href="/profile" />}
           className="gap-2.5 px-2.5 py-2"
@@ -378,6 +390,14 @@ export function Navbar() {
                 <SheetFooter className="border-t">
                   {user ? (
                     <>
+                      <Link
+                        href={`/dashboard/${user.role ?? "student"}`}
+                        onClick={() => setSheetOpen(false)}
+                        className={cn(buttonVariants({}))}
+                      >
+                        <LayoutDashboard />
+                        Dashboard
+                      </Link>
                       <Link
                         href="/profile"
                         onClick={() => setSheetOpen(false)}
