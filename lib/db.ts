@@ -65,13 +65,13 @@ export function getDb(): Promise<Db> {
  * Create the indexes the domain collections rely on. Idempotent — Mongo
  * ignores `createIndex` when an identical index already exists.
  *
- * NOTE: better-auth manages its own indexes on `user` / `session` /
- * `account` / `verification`. We only add the unique email index here as a
- * safety net; if better-auth already created it, this is a no-op.
+ * better-auth is configured with `usePlural: true`, so it owns `users`,
+ * `sessions`, `accounts` and `verifications`. We only add the unique email
+ * index on `users` here as a safety net.
  */
 async function ensureIndexes(db: Db): Promise<void> {
   await Promise.allSettled([
-    db.collection("user").createIndex({ email: 1 }, { unique: true }),
+    db.collection("users").createIndex({ email: 1 }, { unique: true }),
     db.collection("tuitions").createIndex({ tutorId: 1 }),
     db
       .collection("tuitions")
@@ -92,8 +92,5 @@ async function ensureIndexes(db: Db): Promise<void> {
     db.collection("payments").createIndex({ tuitionId: 1 }),
     db.collection("payments").createIndex({ studentId: 1 }),
     db.collection("payments").createIndex({ userId: 1 }),
-    db
-      .collection("bookmarks")
-      .createIndex({ userId: 1, tuitionId: 1 }, { unique: true }),
   ])
 }

@@ -160,6 +160,7 @@ async function main() {
       tutorId,
       tutorName: i % 2 === 0 ? "Tutor A" : "Tutor B",
       status: "approved",
+      isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     }

@@ -7,6 +7,7 @@
  */
 
 export type Role = "student" | "tutor" | "admin"
+export type Plan = "free" | "pro"
 export type TuitionStatus = "pending" | "approved" | "rejected"
 export type TuitionMode = "online" | "in-person"
 export type ApplicationStatus =
@@ -27,6 +28,7 @@ export type Tuition = {
   tutorId: string
   tutorName?: string
   status: TuitionStatus
+  isActive?: boolean
   moderationNote?: string
   createdAt: string
   updatedAt: string
@@ -51,7 +53,7 @@ export type Payment = {
   amount: number
   currency: string
   status: PaymentStatus
-  plan?: "pro" | "free"
+  plan?: Plan
   createdAt: string
 }
 
@@ -61,9 +63,11 @@ export type UserProfile = {
   email: string
   emailVerified: boolean
   role: Role
+  plan?: Plan
   phone?: string
   bio?: string
   image?: string | null
+  savedTuitions?: string[]
   createdAt?: string
 }
 
