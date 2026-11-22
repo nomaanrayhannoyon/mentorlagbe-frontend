@@ -7,7 +7,7 @@ import { toObjectId, jsonError } from "@/lib/api"
 /**
  * POST /api/admin/tuitions/[id]/review
  * Admin-only: approve or reject a tuition.
- * Body: { status: "approved" | "rejected", moderationNote?: string }
+ * Body: { approvalStatus: "approved" | "rejected", moderationNote?: string }
  *
  * (The moderation queue listing lives at GET /api/admin/tuitions.)
  */
@@ -15,7 +15,7 @@ import { toObjectId, jsonError } from "@/lib/api"
 type ReviewContext = { params: Promise<{ id: string }> }
 
 const reviewSchema = z.object({
-  status: z.enum(["approved", "rejected"]),
+  approvalStatus: z.enum(["approved", "rejected"]),
   moderationNote: z.string().trim().max(500).optional(),
 })
 
@@ -38,14 +38,14 @@ export async function POST(request: Request, context: ReviewContext) {
   if (!parsed.success) {
     return jsonError("Validation failed", 422, parsed.error.flatten())
   }
-  const { status, moderationNote } = parsed.data
+  const { approvalStatus, moderationNote } = parsed.data
 
   const col = await getCollection<Tuition>(Collections.tuitions)
   const updated = await col.findOneAndUpdate(
     { _id: tuitionId },
     {
       $set: {
-        status,
+        approvalStatus,
         moderationNote,
         updatedAt: new Date(),
       },

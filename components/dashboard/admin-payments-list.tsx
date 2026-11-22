@@ -99,7 +99,7 @@ export function AdminPaymentsList() {
           <Card key={p._id} className="flex items-center justify-between p-5">
             <div>
               <p className="font-semibold">
-                {p.plan === "pro" ? "Pro Membership" : "Payment"}
+                {p.planName ?? "Payment"}
                 <span className="ml-2 text-sm font-normal text-muted-foreground">
                   user: {p.userId.slice(0, 8)}…
                 </span>
@@ -113,8 +113,8 @@ export function AdminPaymentsList() {
               <p className="font-bold">
                 {p.amount > 0 ? `$${p.amount.toFixed(2)}` : "—"}
               </p>
-              <Badge variant={statusVariant[p.status]} className="mt-1">
-                {p.status}
+              <Badge variant={statusVariant[p.paymentStatus]} className="mt-1">
+                {p.paymentStatus}
               </Badge>
             </div>
           </Card>

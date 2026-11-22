@@ -56,15 +56,33 @@ export async function POST(request: Request) {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.userId
         const amountTotal = session.amount_total ?? 0
+        // Spec: transactionId. Checkout in subscription mode leaves
+        // payment_intent null until the invoice pays, so fall back to the
+        // subscription id (then the session id) to always record one.
+        const transactionId =
+          (typeof session.payment_intent === "string"
+            ? session.payment_intent
+            : null) ??
+          (typeof session.subscription === "string"
+            ? session.subscription
+            : null) ??
+          session.id
         if (session.id) {
+          const email =
+            (session.customer_details?.email as string | undefined) ??
+            (session.customer_email as string | undefined)
           await payCol.updateOne(
             { stripeSessionId: session.id },
             {
               $set: {
-                status: "paid",
+                paymentStatus: "paid",
                 amount: amountTotal / 100,
                 currency: session.currency ?? "usd",
-                plan: (session.metadata?.plan as "pro") ?? "pro",
+                planName:
+                  (session.metadata?.planName as string | undefined) ?? "Pro",
+                transactionId,
+                paidAt: new Date(),
+                ...(email ? { userEmail: email } : {}),
               },
             },
             { upsert: true }
@@ -87,7 +105,7 @@ export async function POST(request: Request) {
         if (session.id) {
           await payCol.updateOne(
             { stripeSessionId: session.id },
-            { $set: { status: "failed" } },
+            { $set: { paymentStatus: "failed" } },
             { upsert: true }
           )
         }
@@ -95,10 +113,10 @@ export async function POST(request: Request) {
       }
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription
-        // Mark the latest paid payment for this customer as refunded.
+        // Mark the payment for this subscription as refunded.
         await payCol.updateOne(
           { stripeSessionId: sub.id },
-          { $set: { status: "refunded" } }
+          { $set: { paymentStatus: "refunded" } }
         )
         // Downgrade the user back to free when their subscription ends.
         const userId = sub.metadata?.userId

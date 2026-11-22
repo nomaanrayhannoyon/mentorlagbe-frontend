@@ -40,7 +40,7 @@ export default async function TuitionDetailPage({
   if (!tuition) notFound()
 
   // Only approved, still-active tuitions are publicly visible.
-  if (tuition.status !== "approved" || tuition.isActive === false) {
+  if (tuition.approvalStatus !== "approved" || tuition.isActive === false) {
     notFound()
   }
 
@@ -77,10 +77,10 @@ export default async function TuitionDetailPage({
           {/* Main column */}
           <div className="space-y-6">
             {/* Cover image */}
-            {tuition.image ? (
+            {tuition.bannerImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={tuition.image}
+                src={tuition.bannerImage}
                 alt={tuition.title}
                 className="aspect-[2/1] w-full rounded-2xl object-cover"
               />
@@ -99,14 +99,14 @@ export default async function TuitionDetailPage({
                 >
                   {tuition.subject}
                 </Badge>
-                <Badge variant="secondary">{tuition.level}</Badge>
+                <Badge variant="secondary">{tuition.classLevel}</Badge>
                 <Badge variant="outline" className="gap-1">
-                  {tuition.mode === "online" ? (
+                  {tuition.mode === "Online" ? (
                     <Globe className="size-3" />
                   ) : (
                     <MapPin className="size-3" />
                   )}
-                  {tuition.mode === "online"
+                  {tuition.mode === "Online"
                     ? "Online"
                     : (tuition.location ?? "In person")}
                 </Badge>
@@ -134,13 +134,13 @@ export default async function TuitionDetailPage({
               </p>
             </div>
 
-            {tuition.schedule && (
+            {tuition.daysPerWeek && (
               <div className="flex items-start gap-3 rounded-xl bg-muted/50 p-4">
                 <Calendar className="mt-0.5 size-5 shrink-0 text-burgundy-600" />
                 <div>
                   <p className="text-sm font-semibold">Schedule</p>
                   <p className="text-sm text-muted-foreground">
-                    {tuition.schedule}
+                    {tuition.daysPerWeek} days per week
                   </p>
                 </div>
               </div>
@@ -153,7 +153,7 @@ export default async function TuitionDetailPage({
               <div>
                 <p className="text-sm text-muted-foreground">Monthly fee</p>
                 <p className="text-3xl font-extrabold text-burgundy-600 dark:text-burgundy-400">
-                  ৳{(tuition.price ?? 0).toLocaleString()}
+                  ৳{(tuition.monthlyFee ?? 0).toLocaleString()}
                 </p>
               </div>
 

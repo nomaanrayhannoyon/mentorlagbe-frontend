@@ -15,6 +15,10 @@ import { toObjectId, jsonError } from "@/lib/api"
  * - Students see their own applications.
  * - Tutors see applications to their tuitions.
  * - Admins see everything.
+ *
+ * Applications denormalise the tuition summary (tuitionTitle, subject,
+ * monthlyFee,  tutorEmail) at write time per the assignment's
+ * data design, so no join is needed here.
  */
 export async function GET() {
   const auth = await getApiSession()
@@ -40,51 +44,27 @@ export async function GET() {
     filter = { studentId: userId }
   }
 
-  const items = await col.find(filter).sort({ createdAt: -1 }).toArray()
+  const items = await col.find(filter).sort({ appliedAt: -1 }).toArray()
 
-  // Join the referenced tuition (title/subject/level/mode/price) so every
-  // role can render meaningful cards without a second round-trip. For admins
-  // this includes pending/rejected tuitions; for tutors it is limited to their
-  // own tuitions by the filter above.
-  const tuitionIds = [
-    ...new Set(items.map((i) => i.tuitionId).filter((id) => toObjectId(id))),
-  ]
-  const tuitionsCol = await getCollection<Tuition>(Collections.tuitions)
-  const tuitions = await tuitionsCol
-    .find({
-      _id: { $in: tuitionIds.map((id) => toObjectId(id)!) },
-    })
-    .project({ title: 1, subject: 1, level: 1, mode: 1, price: 1 })
-    .toArray()
-  const tuitionMap = new Map(tuitions.map((t) => [t._id.toString(), t]))
-
-  const enriched = items.map((item) => {
-    const t = tuitionMap.get(item.tuitionId)
-    return {
-      ...item,
-      tuition: t
-        ? {
-            title: t.title,
-            subject: t.subject,
-            level: t.level,
-            mode: t.mode,
-            price: t.price,
-          }
-        : undefined,
-    }
-  })
-
-  return NextResponse.json({ items: enriched })
+  return NextResponse.json({ items })
 }
 
 const createSchema = z.object({
   tuitionId: z.string().min(1, "tuitionId is required"),
-  message: z.string().trim().max(2000).optional().default(""),
+  studentPhone: z.string().trim().min(7, "A phone number is required").max(30),
+  preferredSchedule: z
+    .string()
+    .trim()
+    .min(3, "Tell the tutor when you are available")
+    .max(160),
+  studentNote: z.string().trim().max(2000).optional().default(""),
 })
 
 /**
  * POST /api/applications
- * Student applies to a tuition.
+ * Student applies to a tuition (status: 'pending'). Duplicate applications
+ * from the same student for the same tuition are blocked by the unique
+ * index plus an explicit check.
  */
 export async function POST(request: Request) {
   const auth = await requireApiRole("student")
@@ -101,13 +81,14 @@ export async function POST(request: Request) {
   if (!parsed.success)
     return jsonError("Validation failed", 422, parsed.error.flatten())
 
-  const { tuitionId, message } = parsed.data
+  const { tuitionId, studentPhone, preferredSchedule, studentNote } =
+    parsed.data
   const tuitionObjectId = toObjectId(tuitionId)
   if (!tuitionObjectId) return jsonError("Invalid tuitionId", 400)
 
   const tuitionsCol = await getCollection<Tuition>(Collections.tuitions)
   const tuition = await tuitionsCol.findOne({ _id: tuitionObjectId })
-  if (!tuition || tuition.status !== "approved") {
+  if (!tuition || tuition.approvalStatus !== "approved") {
     return jsonError("Tuition not found or not available", 404)
   }
   if (tuition.tutorId === auth.session.user.id) {
@@ -126,11 +107,18 @@ export async function POST(request: Request) {
   const now = new Date()
   const doc: Omit<Application, "_id"> = {
     tuitionId,
+    tuitionTitle: tuition.title,
+    subject: tuition.subject,
+    monthlyFee: tuition.monthlyFee,
+    tutorEmail: tuition.tutorEmail ?? "",
     studentId: auth.session.user.id,
     studentName: auth.session.user.name,
-    message,
+    studentEmail: auth.session.user.email,
+    studentPhone,
+    preferredSchedule,
+    studentNote,
     status: "pending",
-    createdAt: now,
+    appliedAt: now,
     updatedAt: now,
   }
 

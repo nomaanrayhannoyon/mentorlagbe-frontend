@@ -25,7 +25,7 @@ export default async function Page() {
   try {
     const col = await getCollection<Tuition>(Collections.tuitions)
     const rows = await col
-      .find({ status: "approved" })
+      .find({ approvalStatus: "approved" })
       .project({ tutorId: 0 })
       .sort({ createdAt: -1 })
       .limit(6)
@@ -36,15 +36,15 @@ export default async function Page() {
       title: r.title,
       description: r.description,
       subject: r.subject,
-      level: r.level,
+      classLevel: r.classLevel,
       mode: r.mode,
       location: r.location,
-      price: r.price,
-      schedule: r.schedule,
-      image: r.image,
+      monthlyFee: r.monthlyFee,
+      daysPerWeek: r.daysPerWeek,
+      bannerImage: r.bannerImage,
       tutorId: "",
       tutorName: r.tutorName,
-      status: r.status,
+      approvalStatus: r.approvalStatus,
       isActive: r.isActive,
       moderationNote: r.moderationNote,
       createdAt: toIso(r.createdAt),

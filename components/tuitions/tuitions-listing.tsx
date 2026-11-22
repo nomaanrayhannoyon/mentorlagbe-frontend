@@ -39,7 +39,7 @@ export function TuitionsListing() {
   const [q, setQ] = useState(searchParams.get("q") ?? "")
   const [subject, setSubject] = useState(searchParams.get("subject") ?? "")
   const [mode, setMode] = useState(searchParams.get("mode") ?? "")
-  const [level, setLevel] = useState(searchParams.get("level") ?? "")
+  const [level, setLevel] = useState(searchParams.get("classLevel") ?? "")
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") ?? "")
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") ?? "")
   const [sort, setSort] = useState(searchParams.get("sort") ?? "newest")
@@ -54,7 +54,7 @@ export function TuitionsListing() {
     if (q) params.set("q", q)
     if (subject) params.set("subject", subject)
     if (mode) params.set("mode", mode)
-    if (level) params.set("level", level)
+    if (level) params.set("classLevel", level)
     if (minPrice) params.set("minPrice", minPrice)
     if (maxPrice) params.set("maxPrice", maxPrice)
     if (sort && sort !== "newest") params.set("sort", sort)
@@ -77,7 +77,7 @@ export function TuitionsListing() {
     if (q) params.set("q", q)
     if (subject) params.set("subject", subject)
     if (mode) params.set("mode", mode)
-    if (level) params.set("level", level)
+    if (level) params.set("classLevel", level)
     if (minPrice) params.set("minPrice", minPrice)
     if (maxPrice) params.set("maxPrice", maxPrice)
     if (sort) params.set("sort", sort)
@@ -225,8 +225,8 @@ export function TuitionsListing() {
                   <div className="flex flex-wrap gap-2">
                     {[
                       { value: "", label: "Any" },
-                      { value: "online", label: "Online" },
-                      { value: "in-person", label: "In person" },
+                      { value: "Online", label: "Online" },
+                      { value: "Offline", label: "In person" },
                     ].map((opt) => (
                       <button
                         key={opt.value}

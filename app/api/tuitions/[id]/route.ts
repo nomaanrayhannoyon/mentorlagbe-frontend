@@ -21,7 +21,7 @@ export async function GET(_request: Request, context: RouteContext) {
   if (!tuition) return jsonError("Tuition not found", 404)
 
   // Only approved tuitions are public.
-  if (tuition.status !== "approved") {
+  if (tuition.approvalStatus !== "approved") {
     const auth = await requireApiRole(["tutor", "admin"])
     if (!auth.ok) return jsonError("Tuition not found", 404)
     const isOwner = tuition.tutorId === auth.session.user.id
@@ -36,12 +36,12 @@ const updateSchema = z.object({
   title: z.string().trim().min(3).max(120).optional(),
   description: z.string().trim().min(20).max(2000).optional(),
   subject: z.string().trim().min(2).max(80).optional(),
-  level: z.string().trim().min(1).max(80).optional(),
-  mode: z.enum(["online", "in-person"]).optional(),
+  classLevel: z.string().trim().min(1).max(80).optional(),
+  mode: z.enum(["Online", "Offline"]).optional(),
   location: z.string().trim().max(120).optional(),
-  price: z.coerce.number().min(0).max(100000).optional(),
-  schedule: z.string().trim().max(160).optional(),
-  image: z.string().url().optional().or(z.literal("")),
+  monthlyFee: z.coerce.number().min(0).max(100000).optional(),
+  daysPerWeek: z.coerce.number().int().min(1).max(7).optional(),
+  bannerImage: z.string().url().optional().or(z.literal("")),
   /** Tutors can open/close their tuition for new applications. */
   isActive: z.boolean().optional(),
 })
@@ -79,19 +79,22 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (!parsed.success)
     return jsonError("Validation failed", 422, parsed.error.flatten())
 
-  const { image, isActive, ...rest } = parsed.data
+  const { bannerImage, isActive, ...rest } = parsed.data
 
   const update: Partial<Tuition> & { updatedAt: Date } = {
-    ...(image !== undefined ? { image: image || undefined } : {}),
+    ...(bannerImage !== undefined
+      ? { bannerImage: bannerImage || undefined }
+      : {}),
     ...(isActive !== undefined ? { isActive } : {}),
     updatedAt: new Date(),
   }
 
   // Content edits require re-moderation; a bare open/close toggle does not.
-  const hasContentEdits = Object.keys(rest).length > 0 || image !== undefined
+  const hasContentEdits =
+    Object.keys(rest).length > 0 || bannerImage !== undefined
   if (hasContentEdits) {
     Object.assign(update, rest)
-    update.status = "pending"
+    update.approvalStatus = "pending"
     update.moderationNote = undefined
   }
 

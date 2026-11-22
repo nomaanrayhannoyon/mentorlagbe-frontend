@@ -127,14 +127,14 @@ export function ModerationList() {
                 <div className="min-w-0 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold">{tuition.title}</h3>
-                    <Badge variant={statusVariant[tuition.status]}>
-                      {statusLabel[tuition.status]}
+                    <Badge variant={statusVariant[tuition.approvalStatus]}>
+                      {statusLabel[tuition.approvalStatus]}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {tuition.subject} · {tuition.level} · {tuition.mode}
+                    {tuition.subject} · {tuition.classLevel} · {tuition.mode}
                     {tuition.location ? ` · ${tuition.location}` : ""} · ৳
-                    {tuition.price}
+                    {tuition.monthlyFee}
                   </p>
                   <p className="text-sm text-foreground/80">
                     {tuition.description}
@@ -143,9 +143,9 @@ export function ModerationList() {
                     By {tuition.tutorName ?? "Tutor"} ·{" "}
                     {new Date(tuition.createdAt).toLocaleDateString()}
                   </p>
-                  {tuition.image && (
+                  {tuition.bannerImage && (
                     <a
-                      href={tuition.image}
+                      href={tuition.bannerImage}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-sm text-burgundy-600 hover:underline"
@@ -155,7 +155,7 @@ export function ModerationList() {
                   )}
                 </div>
 
-                {tuition.status === "pending" && (
+                {tuition.approvalStatus === "pending" && (
                   <div className="flex shrink-0 flex-col gap-2">
                     {rejectingId === tuition._id ? (
                       <>

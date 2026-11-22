@@ -20,6 +20,8 @@ import { Textarea } from "@/components/ui/textarea"
 export function ApplyButton({ tuitionId }: { tuitionId: string }) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState("")
+  const [phone, setPhone] = useState("")
+  const [schedule, setSchedule] = useState("")
   const [submitting, setSubmitting] = useState(false)
   const [applied, setApplied] = useState(false)
   const [checking, setChecking] = useState(true)
@@ -47,7 +49,12 @@ export function ApplyButton({ tuitionId }: { tuitionId: string }) {
     try {
       await apiFetch("/api/applications", {
         method: "POST",
-        body: { tuitionId, message },
+        body: {
+          tuitionId,
+          studentPhone: phone,
+          preferredSchedule: schedule,
+          studentNote: message,
+        },
       })
       setApplied(true)
       setOpen(false)
@@ -93,6 +100,26 @@ export function ApplyButton({ tuitionId }: { tuitionId: string }) {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
+            <Label htmlFor="apply-phone">Phone number</Label>
+            <Textarea
+              id="apply-phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="e.g. 01712345678"
+              rows={1}
+              maxLength={30}
+              className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm"
+            />
+            <Label htmlFor="apply-schedule">Preferred schedule</Label>
+            <Textarea
+              id="apply-schedule"
+              value={schedule}
+              onChange={(e) => setSchedule(e.target.value)}
+              placeholder="e.g. Weekday evenings"
+              rows={1}
+              maxLength={160}
+              className="rounded-lg border border-input bg-transparent px-3 py-2 text-sm"
+            />
             <Label htmlFor="apply-message">Message (optional)</Label>
             <Textarea
               id="apply-message"
@@ -111,7 +138,7 @@ export function ApplyButton({ tuitionId }: { tuitionId: string }) {
             <Button
               variant="outline"
               onClick={() => setOpen(false)}
-              disabled={submitting}
+              disabled={submitting || !phone.trim() || !schedule.trim()}
             >
               Cancel
             </Button>

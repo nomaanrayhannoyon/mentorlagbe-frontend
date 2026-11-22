@@ -20,31 +20,35 @@ import { getDb } from "@/lib/db"
 
 export type Role = "student" | "tutor" | "admin"
 export type TuitionStatus = "pending" | "approved" | "rejected"
-export type TuitionMode = "online" | "in-person"
-export type ApplicationStatus =
-  "pending" | "accepted" | "rejected" | "withdrawn"
+/** Spec: mode ('Online' | 'Offline'). */
+export type TuitionMode = "Online" | "Offline"
+/** Spec: status ('pending' | 'accepted' | 'rejected'). */
+export type ApplicationStatus = "pending" | "accepted" | "rejected"
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded"
 export type Plan = "free" | "pro"
 
-/** A tuition document as stored in Mongo. */
+/** A tuition document as stored in Mongo (spec field names). */
 export type Tuition = {
   _id: ObjectId
   title: string
   description: string
   subject: string
-  /** Class / level label, e.g. "Class 9", "HSC", "University". */
-  level: string
+  /** Spec: classLevel, e.g. "Class 9", "HSC", "University". */
+  classLevel: string
   mode: TuitionMode
-  /** Required when mode === "in-person". */
+  /** Required when mode === "Offline". */
   location?: string
-  price: number
-  /** Free-form schedule text, e.g. "Weekday evenings". */
-  schedule?: string
-  /** ImgBB URL. */
-  image?: string
+  /** Spec: monthlyFee (BDT per month). */
+  monthlyFee: number
+  /** Spec: daysPerWeek, 1–7. */
+  daysPerWeek?: number
+  /** Spec: bannerImage — ImgBB URL. */
+  bannerImage?: string
   tutorId: string
   tutorName?: string
-  status: TuitionStatus
+  tutorEmail?: string
+  /** Spec: approvalStatus ('pending' | 'approved' | 'rejected'). */
+  approvalStatus: TuitionStatus
   /** Whether the tutor is still accepting applications. */
   isActive: boolean
   /** Admin note when rejecting. */
@@ -56,26 +60,46 @@ export type Tuition = {
 export type Application = {
   _id: ObjectId
   tuitionId: string
+  /** Denormalised tuition summary (spec fields). */
+  tuitionTitle: string
+  subject: string
+  monthlyFee: number
+  tutorEmail: string
   studentId: string
-  studentName?: string
-  message: string
+  studentName: string
+  studentEmail: string
+  studentPhone: string
+  /** Spec: preferredSchedule. */
+  preferredSchedule?: string
+  /** Spec: studentNote. */
+  studentNote?: string
   status: ApplicationStatus
-  createdAt: Date
+  /** Spec: appliedAt. */
+  appliedAt: Date
   updatedAt: Date
 }
 
 export type Payment = {
   _id: ObjectId
-  tuitionId?: string
   userId: string
-  /** Stripe checkout session id. */
+  /** Spec: userEmail / userName / userRole. */
+  userEmail: string
+  userName: string
+  userRole: Role
+  /** Spec: planName, e.g. "Pro Tutor", "Pro Student". */
+  planName?: string
+  amount: number
+  currency: string
+  /** Spec: transactionId (Stripe payment intent id). */
+  transactionId?: string
+  /** Spec: stripeSessionId. */
   stripeSessionId?: string
   /** Stripe subscription id (recurring plans). */
   stripeSubscriptionId?: string
-  amount: number
-  currency: string
-  status: PaymentStatus
-  plan?: Plan
+  /** Spec: paymentStatus ('paid' after webhook confirmation). */
+  paymentStatus: PaymentStatus
+  /** Spec: paidAt. */
+  paidAt?: Date
   createdAt: Date
 }
 

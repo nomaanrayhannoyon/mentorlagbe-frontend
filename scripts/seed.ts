@@ -115,28 +115,28 @@ async function main() {
   const subjects: Array<{
     subject: string
     mode: TuitionMode
-    level: string
+    classLevel: string
     location?: string
   }> = [
     {
       subject: "Mathematics",
-      mode: "in-person",
-      level: "Class 9",
+      mode: "Offline",
+      classLevel: "Class 9",
       location: "Dhanmondi, Dhaka",
     },
-    { subject: "Physics", mode: "online", level: "HSC" },
+    { subject: "Physics", mode: "Online", classLevel: "HSC" },
     {
       subject: "Chemistry",
-      mode: "in-person",
-      level: "Class 10",
+      mode: "Offline",
+      classLevel: "Class 10",
       location: "Mirpur, Dhaka",
     },
-    { subject: "English", mode: "online", level: "SSC" },
-    { subject: "Programming", mode: "online", level: "University" },
+    { subject: "English", mode: "Online", classLevel: "SSC" },
+    { subject: "Programming", mode: "Online", classLevel: "University" },
     {
       subject: "Biology",
-      mode: "in-person",
-      level: "HSC",
+      mode: "Offline",
+      classLevel: "HSC",
       location: "Uttara, Dhaka",
     },
   ]
@@ -154,14 +154,14 @@ async function main() {
       title,
       description: `Personalized ${s.subject.toLowerCase()} tutoring focused on concept clarity and exam preparation.`,
       subject: s.subject,
-      level: s.level,
+      classLevel: s.classLevel,
       mode: s.mode,
       location: s.location,
-      price: 20 + i * 5,
-      schedule: "Weekday evenings",
+      monthlyFee: 20 + i * 5,
+
       tutorId,
       tutorName: i % 2 === 0 ? "Tutor A" : "Tutor B",
-      status: "approved",
+      approvalStatus: "approved",
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),

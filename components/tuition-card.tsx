@@ -19,7 +19,7 @@ function TuitionCard({ tuition }: { tuition: Tuition }) {
 
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
-  const isOnline = tuition.mode === "online"
+  const isOnline = tuition.mode === "Online"
 
   // Load bookmark state when the user signs in.
   useEffect(() => {
@@ -71,9 +71,9 @@ function TuitionCard({ tuition }: { tuition: Tuition }) {
     <Card className="group gap-3 p-3 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:ring-burgundy-500/40">
       <div className="relative overflow-hidden rounded-xl">
         <Link href={`/tuitions/${tuition._id}`}>
-          {tuition.image ? (
+          {tuition.bannerImage ? (
             <Image
-              src={tuition.image}
+              src={tuition.bannerImage}
               alt={`${tuition.subject} tuition session`}
               width={800}
               height={400}
@@ -136,7 +136,7 @@ function TuitionCard({ tuition }: { tuition: Tuition }) {
             {tuition.subject}
           </Badge>
           <span className="truncate text-right text-sm text-muted-foreground">
-            {tuition.level}
+            {tuition.classLevel}
           </span>
         </div>
         <Link
@@ -147,7 +147,7 @@ function TuitionCard({ tuition }: { tuition: Tuition }) {
         </Link>
         <div className="flex items-center justify-between">
           <span className="text-sm font-bold text-burgundy-600 dark:text-burgundy-400">
-            ৳{(tuition.price ?? 0).toLocaleString()}
+            ৳{(tuition.monthlyFee ?? 0).toLocaleString()}
           </span>
           {tuition.tutorName && (
             <span className="truncate text-xs text-muted-foreground">

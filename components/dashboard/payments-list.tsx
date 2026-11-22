@@ -66,9 +66,7 @@ export function PaymentsList() {
       {items.map((p) => (
         <Card key={p._id} className="flex items-center justify-between p-5">
           <div>
-            <p className="font-semibold">
-              {p.plan === "pro" ? "Pro Membership" : "Payment"}
-            </p>
+            <p className="font-semibold">{p.planName ?? "Payment"}</p>
             <p className="text-sm text-muted-foreground">
               {new Date(p.createdAt).toLocaleDateString()} ·{" "}
               {p.currency.toUpperCase()}
@@ -78,8 +76,8 @@ export function PaymentsList() {
             <p className="font-bold">
               {p.amount > 0 ? `$${p.amount.toFixed(2)}` : "—"}
             </p>
-            <Badge variant={statusVariant[p.status]} className="mt-1">
-              {p.status}
+            <Badge variant={statusVariant[p.paymentStatus]} className="mt-1">
+              {p.paymentStatus}
             </Badge>
           </div>
         </Card>

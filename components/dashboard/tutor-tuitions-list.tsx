@@ -116,27 +116,28 @@ export function TutorTuitionsList() {
               <div className="min-w-0 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold">{tuition.title}</h3>
-                  <Badge variant={statusVariant[tuition.status]}>
-                    {statusLabel[tuition.status]}
+                  <Badge variant={statusVariant[tuition.approvalStatus]}>
+                    {statusLabel[tuition.approvalStatus]}
                   </Badge>
-                  {tuition.status === "approved" &&
+                  {tuition.approvalStatus === "approved" &&
                     tuition.isActive === false && (
                       <Badge variant="outline">Closed</Badge>
                     )}
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {tuition.subject} · {tuition.level} · {tuition.mode} · ৳
-                  {tuition.price}
+                  {tuition.subject} · {tuition.classLevel} · {tuition.mode} · ৳
+                  {tuition.monthlyFee}
                 </p>
-                {tuition.status === "rejected" && tuition.moderationNote && (
-                  <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                    Note from admin: {tuition.moderationNote}
-                  </p>
-                )}
+                {tuition.approvalStatus === "rejected" &&
+                  tuition.moderationNote && (
+                    <p className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                      Note from admin: {tuition.moderationNote}
+                    </p>
+                  )}
               </div>
 
               <div className="flex shrink-0 gap-2">
-                {tuition.status === "approved" && (
+                {tuition.approvalStatus === "approved" && (
                   <Button
                     size="sm"
                     variant="outline"

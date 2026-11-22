@@ -71,11 +71,26 @@ export function getDb(): Promise<Db> {
  */
 async function ensureIndexes(db: Db): Promise<void> {
   await Promise.allSettled([
+    // Stale indexes from earlier schema versions (status/level/price naming,
+    // legacy payment fields). dropIndex fails harmlessly when absent.
+    db.collection("tuitions").dropIndex("status_1_subject_1_mode_1_level_1"),
+    db.collection("tuitions").dropIndex("status_1_price_1_createdAt_-1"),
+    db.collection("tuitions").dropIndex("status_1_subject_1"),
+    db.collection("payments").dropIndex("tuitionId_1"),
+    db.collection("payments").dropIndex("studentId_1"),
+    // A unique index on transactionId breaks checkout: pending records have no
+    // transactionId yet and Mongo indexes them all as null (one allowed).
+    db.collection("payments").dropIndex("transactionId_1"),
+  ])
+  await Promise.allSettled([
     db.collection("users").createIndex({ email: 1 }, { unique: true }),
     db.collection("tuitions").createIndex({ tutorId: 1 }),
-    db
-      .collection("tuitions")
-      .createIndex({ status: 1, subject: 1, mode: 1, level: 1 }),
+    db.collection("tuitions").createIndex({
+      approvalStatus: 1,
+      subject: 1,
+      mode: 1,
+      classLevel: 1,
+    }),
     db.collection("tuitions").createIndex({
       title: "text",
       description: "text",
@@ -83,14 +98,15 @@ async function ensureIndexes(db: Db): Promise<void> {
     }),
     db
       .collection("tuitions")
-      .createIndex({ status: 1, price: 1, createdAt: -1 }),
+      .createIndex({ approvalStatus: 1, monthlyFee: 1, createdAt: -1 }),
     db.collection("applications").createIndex({ tuitionId: 1 }),
     db.collection("applications").createIndex({ studentId: 1 }),
     db
       .collection("applications")
       .createIndex({ tuitionId: 1, studentId: 1 }, { unique: true }),
-    db.collection("payments").createIndex({ tuitionId: 1 }),
-    db.collection("payments").createIndex({ studentId: 1 }),
     db.collection("payments").createIndex({ userId: 1 }),
+    db.collection("payments").createIndex({ stripeSessionId: 1 }),
+    db.collection("payments").createIndex({ paymentStatus: 1 }),
+    db.collection("payments").createIndex({ transactionId: 1 }),
   ])
 }

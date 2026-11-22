@@ -7,25 +7,26 @@ import { canPostTuition, getPlanLimits, planLimitMessage } from "@/lib/plans"
 /**
  * GET /api/tuitions
  *
- * Public, paginated, searchable list of APPROVED tuitions.
+ * Public, paginated, searchable list of APPROVED tuitions
+ * (Challenge 1: server-side search & filter).
  *
  * Query params:
- *   q        — full-text / substring search over title, subject, description
- *   subject  — exact subject filter
- *   mode     — "online" | "in-person"
- *   level    — exact level filter
- *   minPrice — number
- *   maxPrice — number
- *   sort     — "price_asc" | "price_desc" | "newest" | "oldest"
- *   page     — 1-based (default 1)
- *   limit    — page size (default 12, max 50)
+ *   q           — substring search over title, subject, description
+ *   subject     — exact subject filter
+ *   mode        — "Online" | "Offline"
+ *   classLevel  — exact class level filter (e.g. "Class 9", "HSC")
+ *   minPrice    — minimum monthlyFee
+ *   maxPrice    — maximum monthlyFee
+ *   sort        — "price_asc" | "price_desc" | "newest" | "oldest"
+ *   page        — 1-based (default 1)
+ *   limit       — page size (default 12, max 50)
  */
 
 const listQuerySchema = z.object({
   q: z.string().trim().max(120).optional(),
   subject: z.string().trim().max(80).optional(),
-  mode: z.enum(["online", "in-person"]).optional(),
-  level: z.string().trim().max(80).optional(),
+  mode: z.enum(["Online", "Offline"]).optional(),
+  classLevel: z.string().trim().max(80).optional(),
   minPrice: z.coerce.number().min(0).optional(),
   maxPrice: z.coerce.number().min(0).optional(),
   sort: z
@@ -47,24 +48,33 @@ export async function GET(request: Request) {
     )
   }
 
-  const { q, subject, mode, level, minPrice, maxPrice, sort, page, limit } =
-    parsed.data
+  const {
+    q,
+    subject,
+    mode,
+    classLevel,
+    minPrice,
+    maxPrice,
+    sort,
+    page,
+    limit,
+  } = parsed.data
 
   const col = await getCollection<Tuition>(Collections.tuitions)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const filter: Record<string, any> = {
-    status: "approved",
+    approvalStatus: "approved",
     isActive: true,
   }
 
   if (subject) filter.subject = subject
   if (mode) filter.mode = mode
-  if (level) filter.level = level
+  if (classLevel) filter.classLevel = classLevel
   if (typeof minPrice === "number" || typeof maxPrice === "number") {
-    filter.price = {}
-    if (typeof minPrice === "number") filter.price.$gte = minPrice
-    if (typeof maxPrice === "number") filter.price.$lte = maxPrice
+    filter.monthlyFee = {}
+    if (typeof minPrice === "number") filter.monthlyFee.$gte = minPrice
+    if (typeof maxPrice === "number") filter.monthlyFee.$lte = maxPrice
   }
   if (q) {
     // Use a regex for substring matching (the text index is used by $text,
@@ -78,8 +88,8 @@ export async function GET(request: Request) {
   }
 
   const sortMap: Record<string, Record<string, 1 | -1>> = {
-    price_asc: { price: 1 },
-    price_desc: { price: -1 },
+    price_asc: { monthlyFee: 1 },
+    price_desc: { monthlyFee: -1 },
     newest: { createdAt: -1 },
     oldest: { createdAt: 1 },
   }
@@ -116,12 +126,12 @@ const createSchema = z.object({
   title: z.string().trim().min(3, "Title is too short").max(120),
   description: z.string().trim().min(20, "Description is too short").max(2000),
   subject: z.string().trim().min(2).max(80),
-  level: z.string().trim().min(1).max(80),
-  mode: z.enum(["online", "in-person"]),
+  classLevel: z.string().trim().min(1).max(80),
+  mode: z.enum(["Online", "Offline"]),
   location: z.string().trim().max(120).optional(),
-  price: z.coerce.number().min(0, "Price must be >= 0").max(100000),
-  schedule: z.string().trim().max(160).optional(),
-  image: z.string().url().optional().or(z.literal("")),
+  monthlyFee: z.coerce.number().min(0, "Monthly fee must be >= 0").max(100000),
+  daysPerWeek: z.coerce.number().int().min(1).max(7).optional(),
+  bannerImage: z.string().url().optional().or(z.literal("")),
 })
 
 export async function POST(request: Request) {
@@ -149,17 +159,17 @@ export async function POST(request: Request) {
     title,
     description,
     subject,
-    level,
+    classLevel,
     mode,
     location,
-    price,
-    schedule,
-    image,
+    monthlyFee,
+    daysPerWeek,
+    bannerImage,
   } = parsed.data
 
-  if (mode === "in-person" && !location) {
+  if (mode === "Offline" && !location) {
     return NextResponse.json(
-      { error: "Location is required for in-person tuitions" },
+      { error: "Location is required for offline tuitions" },
       { status: 400 }
     )
   }
@@ -191,15 +201,16 @@ export async function POST(request: Request) {
     title,
     description,
     subject,
-    level,
+    classLevel,
     mode,
-    location,
-    price,
-    schedule,
-    image: image || undefined,
+    location: mode === "Offline" ? location : undefined,
+    monthlyFee,
+    daysPerWeek,
+    bannerImage: bannerImage || undefined,
     tutorId: auth.session.user.id,
     tutorName: auth.session.user.name,
-    status: "pending",
+    tutorEmail: auth.session.user.email,
+    approvalStatus: "pending",
     isActive: true,
     createdAt: now,
     updatedAt: now,

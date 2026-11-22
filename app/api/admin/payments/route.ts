@@ -15,15 +15,15 @@ export async function GET() {
   const col = await getCollection<Payment>(Collections.payments)
   const items = await col.find({}).sort({ createdAt: -1 }).toArray()
 
-  const paid = items.filter((p) => p.status === "paid")
+  const paid = items.filter((p) => p.paymentStatus === "paid")
   const totalRevenue = paid.reduce((sum, p) => sum + (p.amount ?? 0), 0)
-  const pendingCount = items.filter((p) => p.status === "pending").length
-  const failedCount = items.filter((p) => p.status === "failed").length
+  const pendingCount = items.filter((p) => p.paymentStatus === "pending").length
+  const failedCount = items.filter((p) => p.paymentStatus === "failed").length
 
-  // Revenue split by plan (pro vs free/other).
+  // Revenue split by plan (Pro Tutor vs Pro Student).
   const revenueByPlan: Record<string, number> = {}
   for (const p of paid) {
-    const plan = p.plan ?? "pro"
+    const plan = p.planName ?? "Pro"
     revenueByPlan[plan] = (revenueByPlan[plan] ?? 0) + (p.amount ?? 0)
   }
 

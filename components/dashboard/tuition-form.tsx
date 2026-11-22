@@ -44,22 +44,24 @@ export function TuitionForm({ tuition }: Props) {
   const [title, setTitle] = useState(tuition?.title ?? "")
   const [description, setDescription] = useState(tuition?.description ?? "")
   const [subject, setSubject] = useState(tuition?.subject ?? "Mathematics")
-  const [level, setLevel] = useState(tuition?.level ?? "Class 9")
-  const [mode, setMode] = useState<"online" | "in-person">(
-    tuition?.mode ?? "online"
+  const [level, setLevel] = useState(tuition?.classLevel ?? "Class 9")
+  const [mode, setMode] = useState<"Online" | "Offline">(
+    tuition?.mode === "Online" ? "Online" : "Offline"
   )
   const [location, setLocation] = useState(tuition?.location ?? "")
-  const [price, setPrice] = useState(String(tuition?.price ?? ""))
-  const [schedule, setSchedule] = useState(tuition?.schedule ?? "")
-  const [image, setImage] = useState<string | undefined>(tuition?.image)
+  const [price, setPrice] = useState(String(tuition?.monthlyFee ?? ""))
+  const [daysPerWeek, setDaysPerWeek] = useState(
+    tuition?.daysPerWeek != null ? String(tuition.daysPerWeek) : ""
+  )
+  const [image, setImage] = useState<string | undefined>(tuition?.bannerImage)
 
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState("")
 
-  // If the user switches to in-person, require a location.
+  // If the user switches to offline, require a location.
   useEffect(() => {
-    if (mode === "online") setLocation("")
+    if (mode === "Offline") setLocation("")
   }, [mode])
 
   const handleImage = async (file: File) => {
@@ -97,8 +99,8 @@ export function TuitionForm({ tuition }: Props) {
       setError("Price must be a non-negative number.")
       return
     }
-    if (mode === "in-person" && !location.trim()) {
-      setError("Location is required for in-person tuitions.")
+    if (mode === "Offline" && !location.trim()) {
+      setError("Location is required for offline tuitions.")
       return
     }
 
@@ -108,12 +110,12 @@ export function TuitionForm({ tuition }: Props) {
         title,
         description,
         subject,
-        level,
+        classLevel: level,
         mode,
-        location: mode === "in-person" ? location : undefined,
-        price: priceNum,
-        schedule: schedule || undefined,
-        image: image || undefined,
+        location: mode === "Offline" ? location : undefined,
+        monthlyFee: priceNum,
+        daysPerWeek: daysPerWeek ? Number(daysPerWeek) : undefined,
+        bannerImage: image || undefined,
       }
 
       if (isEdit && tuition) {
@@ -265,7 +267,7 @@ export function TuitionForm({ tuition }: Props) {
         <div>
           <Label className="mb-2">Mode</Label>
           <div className="flex gap-2">
-            {(["online", "in-person"] as const).map((m) => (
+            {(["Online", "Offline"] as const).map((m) => (
               <button
                 key={m}
                 type="button"
@@ -277,13 +279,13 @@ export function TuitionForm({ tuition }: Props) {
                     : "border-input hover:bg-muted"
                 )}
               >
-                {m === "online" ? "Online" : "In person"}
+                {m === "Online" ? "Online" : "Offline"}
               </button>
             ))}
           </div>
         </div>
 
-        {mode === "in-person" && (
+        {mode === "Offline" && (
           <div>
             <Label htmlFor="location" className="mb-2">
               Location
@@ -316,14 +318,17 @@ export function TuitionForm({ tuition }: Props) {
             />
           </div>
           <div>
-            <Label htmlFor="schedule" className="mb-2">
-              Schedule (optional)
+            <Label htmlFor="daysPerWeek" className="mb-2">
+              Days per week (optional)
             </Label>
             <Input
-              id="schedule"
-              value={schedule}
-              onChange={(e) => setSchedule(e.target.value)}
-              placeholder="e.g. Weekday evenings"
+              id="daysPerWeek"
+              type="number"
+              min={1}
+              max={7}
+              value={daysPerWeek}
+              onChange={(e) => setDaysPerWeek(e.target.value)}
+              placeholder="e.g. 3"
               className={inputClass}
             />
           </div>

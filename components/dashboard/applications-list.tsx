@@ -18,14 +18,12 @@ const statusVariant: Record<
   pending: "secondary",
   accepted: "default",
   rejected: "destructive",
-  withdrawn: "outline",
 }
 
 const statusLabel: Record<Application["status"], string> = {
   pending: "Pending",
   accepted: "Accepted",
   rejected: "Rejected",
-  withdrawn: "Withdrawn",
 }
 
 type Mode = "student" | "tutor" | "admin"
@@ -71,10 +69,7 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
     void load()
   }, [load])
 
-  const act = async (
-    app: Application,
-    action: "accept" | "reject" | "withdraw"
-  ) => {
+  const act = async (app: Application, action: "accept" | "reject") => {
     setBusyId(app._id)
     try {
       await apiFetch(`/api/applications/${app._id}`, {
@@ -82,11 +77,7 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
         body: { action },
       })
       toast.success(
-        action === "accept"
-          ? "Application accepted."
-          : action === "reject"
-            ? "Application rejected."
-            : "Application withdrawn."
+        action === "accept" ? "Application accepted." : "Application rejected."
       )
       await load()
     } catch (err) {
@@ -128,9 +119,7 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="font-semibold">
-                    {app.tuition?.title ?? "Tuition"}
-                  </h3>
+                  <h3 className="font-semibold">{app.tuitionTitle}</h3>
                   <Badge variant={statusVariant[app.status]}>
                     {statusLabel[app.status]}
                   </Badge>
@@ -149,29 +138,23 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
                     <span className="font-medium text-foreground">
                       {app.studentName ?? "Student"}
                     </span>
-                    {app.tuition && (
-                      <>
-                        {" · "}
-                        {app.tuition.subject} · {app.tuition.level} · ৳
-                        {app.tuition.price}
-                      </>
-                    )}
+                    {" · "}
+                    {app.subject} · ৳{app.monthlyFee}
                   </p>
                 )}
-                {mode === "student" && app.tuition && (
+                {mode === "student" && (
                   <p className="text-sm text-muted-foreground">
-                    Subject: {app.tuition.subject} · Level: {app.tuition.level}{" "}
-                    · ৳{app.tuition.price}
+                    Subject: {app.subject} · ৳{app.monthlyFee}
                   </p>
                 )}
-                {app.message && (
+                {app.studentNote && (
                   <p className="rounded-lg bg-muted/50 p-3 text-sm text-foreground/80">
-                    {app.message}
+                    {app.studentNote}
                   </p>
                 )}
                 <p className="flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="size-3" />
-                  {new Date(app.createdAt).toLocaleDateString()}
+                  {new Date(app.appliedAt).toLocaleDateString()}
                 </p>
               </div>
 
@@ -194,16 +177,6 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
                       <X className="size-4" /> Reject
                     </Button>
                   </>
-                )}
-                {mode === "student" && isPending && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={busyId === app._id}
-                    onClick={() => act(app, "withdraw")}
-                  >
-                    Withdraw
-                  </Button>
                 )}
               </div>
             </div>
