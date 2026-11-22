@@ -41,7 +41,40 @@ export async function GET() {
   }
 
   const items = await col.find(filter).sort({ createdAt: -1 }).toArray()
-  return NextResponse.json({ items })
+
+  // Join the referenced tuition (title/subject/level/mode/price) so every
+  // role can render meaningful cards without a second round-trip. For admins
+  // this includes pending/rejected tuitions; for tutors it is limited to their
+  // own tuitions by the filter above.
+  const tuitionIds = [
+    ...new Set(items.map((i) => i.tuitionId).filter((id) => toObjectId(id))),
+  ]
+  const tuitionsCol = await getCollection<Tuition>(Collections.tuitions)
+  const tuitions = await tuitionsCol
+    .find({
+      _id: { $in: tuitionIds.map((id) => toObjectId(id)!) },
+    })
+    .project({ title: 1, subject: 1, level: 1, mode: 1, price: 1 })
+    .toArray()
+  const tuitionMap = new Map(tuitions.map((t) => [t._id.toString(), t]))
+
+  const enriched = items.map((item) => {
+    const t = tuitionMap.get(item.tuitionId)
+    return {
+      ...item,
+      tuition: t
+        ? {
+            title: t.title,
+            subject: t.subject,
+            level: t.level,
+            mode: t.mode,
+            price: t.price,
+          }
+        : undefined,
+    }
+  })
+
+  return NextResponse.json({ items: enriched })
 }
 
 const createSchema = z.object({

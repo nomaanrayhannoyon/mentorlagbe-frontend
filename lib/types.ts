@@ -34,6 +34,14 @@ export type Tuition = {
   updatedAt: string
 }
 
+export type ApplicationTuition = {
+  title: string
+  subject: string
+  level: string
+  mode: TuitionMode
+  price: number
+}
+
 export type Application = {
   _id: string
   tuitionId: string
@@ -41,6 +49,8 @@ export type Application = {
   studentName?: string
   message: string
   status: ApplicationStatus
+  /** Joined tuition summary from GET /api/applications. */
+  tuition?: ApplicationTuition
   createdAt: string
   updatedAt: string
 }
