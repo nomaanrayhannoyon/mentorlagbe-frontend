@@ -18,7 +18,29 @@ const db = client.db(process.env.MONGODB_DB ?? "mentorlagbe")
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
 
+// Base URL of the app. In production this MUST be the public origin
+// (e.g. https://mentorlagbe.example.com) so better-auth builds the correct
+// OAuth callback URL (https://<origin>/api/auth/callback/google) and sets the
+// right cookie/redirect behaviour. In development it is http://localhost:3000.
+const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL
+
+// Extra origins (comma-separated) that are allowed to call the auth API,
+// e.g. a separately hosted frontend. The base URL is always trusted.
+const TRUSTED_ORIGINS = (process.env.TRUSTED_ORIGINS ?? "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean)
+
+const trustedOrigins = [BETTER_AUTH_URL, ...TRUSTED_ORIGINS].filter(
+  Boolean
+) as string[]
+
 export const auth = betterAuth({
+  // Explicit base URL so callback/redirect URLs are correct in both dev and
+  // production (falls back to better-auth's request-based inference if unset).
+  baseURL: BETTER_AUTH_URL,
+  ...(trustedOrigins.length ? { trustedOrigins } : {}),
+
   database: mongodbAdapter(db, {
     // `client` enables multi-document transactions (Atlas replica set).
     client,
