@@ -1,5 +1,4 @@
-
-import Link from "next/link";
+import Link from "next/link"
 import {
   ArrowRight,
   BookOpen,
@@ -9,17 +8,15 @@ import {
   Eye,
   Search,
   ClipboardCheck,
-  MessageCircle,
   ShieldCheck,
   Monitor,
-  MapPin,
   Star,
   CheckCircle2,
   HeartHandshake,
   Lightbulb,
   TrendingUp,
   Sparkles,
-} from "lucide-react";
+} from "lucide-react"
 
 const features = [
   {
@@ -58,7 +55,7 @@ const features = [
     description:
       "Upgrade to Pro for additional benefits and more opportunities on MentorLagbe.",
   },
-];
+]
 
 const steps = [
   {
@@ -89,38 +86,33 @@ const steps = [
     description:
       "Connect with the right people and begin a more personalized learning journey.",
   },
-];
+]
 
 export default function AboutPage() {
   return (
     <main className="min-h-screen overflow-hidden bg-white text-gray-900">
-
       {/* Hero Section */}
-      <section className="relative px-4 pb-20 pt-20 sm:px-6 lg:pb-28 lg:pt-28">
-        <div className="absolute -left-32 top-10 h-72 w-72 rounded-full bg-red-100/60 blur-3xl" />
+      <section className="relative px-4 pt-20 pb-20 sm:px-6 lg:pt-28 lg:pb-28">
+        <div className="absolute top-10 -left-32 h-72 w-72 rounded-full bg-red-100/60 blur-3xl" />
         <div className="absolute -right-32 bottom-0 h-72 w-72 rounded-full bg-red-50 blur-3xl" />
 
         <div className="relative mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-2">
-
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-red-100 bg-red-50 px-4 py-2 text-sm font-semibold text-red-600">
               <Sparkles size={16} />
               Get to Know MentorLagbe
             </span>
 
-            <h1 className="mt-7 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="mt-7 text-4xl leading-tight font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
               Making Quality
-              <span className="block text-red-600">
-                Education Accessible
-              </span>
+              <span className="block text-red-600">Education Accessible</span>
               for Everyone.
             </h1>
 
             <p className="mt-6 max-w-xl text-base leading-8 text-gray-500 sm:text-lg">
-              MentorLagbe is a smart tuition and mentorship platform
-              that connects students with qualified tutors. We make
-              finding the right educational guidance easier,
-              smarter, and more convenient.
+              MentorLagbe is a smart tuition and mentorship platform that
+              connects students with qualified tutors. We make finding the right
+              educational guidance easier, smarter, and more convenient.
             </p>
 
             <div className="mt-9 flex flex-wrap gap-4">
@@ -165,9 +157,7 @@ export default function AboutPage() {
                   <p className="text-sm font-semibold text-red-600">
                     Welcome to
                   </p>
-                  <h2 className="mt-1 text-2xl font-extrabold">
-                    MentorLagbe
-                  </h2>
+                  <h2 className="mt-1 text-2xl font-extrabold">MentorLagbe</h2>
                 </div>
                 <div className="rounded-2xl bg-red-600 p-3 text-white shadow-lg">
                   <GraduationCap size={30} />
@@ -209,8 +199,8 @@ export default function AboutPage() {
                     </span>
                   </div>
                   <p className="mt-3 text-sm leading-6 text-red-100">
-                    Building meaningful educational connections
-                    through technology and mentorship.
+                    Building meaningful educational connections through
+                    technology and mentorship.
                   </p>
                 </div>
               </div>
@@ -222,7 +212,9 @@ export default function AboutPage() {
               </div>
               <div>
                 <p className="text-sm font-bold">Better Learning</p>
-                <p className="text-xs text-gray-500">Starts with the right tutor</p>
+                <p className="text-xs text-gray-500">
+                  Starts with the right tutor
+                </p>
               </div>
             </div>
           </div>
@@ -233,15 +225,15 @@ export default function AboutPage() {
       <section className="bg-gray-50 px-4 py-20 sm:px-6 lg:py-24">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto mb-14 max-w-2xl text-center">
-            <span className="text-sm font-bold uppercase tracking-widest text-red-600">
+            <span className="text-sm font-bold tracking-widest text-red-600 uppercase">
               Our Purpose
             </span>
             <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl">
               What Drives <span className="text-red-600">Us Forward</span>
             </h2>
             <p className="mt-4 leading-7 text-gray-500">
-              Our goal is to make educational connections simpler
-              and create better learning opportunities for everyone.
+              Our goal is to make educational connections simpler and create
+              better learning opportunities for everyone.
             </p>
           </div>
 
@@ -252,11 +244,10 @@ export default function AboutPage() {
               </div>
               <h3 className="text-2xl font-bold">Our Mission</h3>
               <p className="mt-4 leading-8 text-gray-500">
-                Our mission is to simplify the process of finding
-                qualified tutors and educational opportunities.
-                We aim to help students receive personalized guidance
-                while giving tutors a reliable platform to showcase
-                their teaching skills.
+                Our mission is to simplify the process of finding qualified
+                tutors and educational opportunities. We aim to help students
+                receive personalized guidance while giving tutors a reliable
+                platform to showcase their teaching skills.
               </p>
             </div>
 
@@ -266,10 +257,10 @@ export default function AboutPage() {
               </div>
               <h3 className="text-2xl font-bold">Our Vision</h3>
               <p className="mt-4 leading-8 text-gray-500">
-                Our vision is to build a trusted digital education
-                community where students and tutors can connect
-                effortlessly, share knowledge, and create meaningful
-                learning experiences without unnecessary barriers.
+                Our vision is to build a trusted digital education community
+                where students and tutors can connect effortlessly, share
+                knowledge, and create meaningful learning experiences without
+                unnecessary barriers.
               </p>
             </div>
           </div>
@@ -280,21 +271,21 @@ export default function AboutPage() {
       <section className="px-4 py-20 sm:px-6 lg:py-24">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto mb-16 max-w-2xl text-center">
-            <span className="text-sm font-bold uppercase tracking-widest text-red-600">
+            <span className="text-sm font-bold tracking-widest text-red-600 uppercase">
               Simple Process
             </span>
             <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl">
               How MentorLagbe <span className="text-red-600">Works</span>
             </h2>
             <p className="mt-4 leading-7 text-gray-500">
-              Getting started is simple. Follow four easy steps
-              to connect, apply, and begin your learning journey.
+              Getting started is simple. Follow four easy steps to connect,
+              apply, and begin your learning journey.
             </p>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((step) => {
-              const Icon = step.icon;
+              const Icon = step.icon
 
               return (
                 <div
@@ -315,7 +306,7 @@ export default function AboutPage() {
                     {step.description}
                   </p>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
@@ -325,7 +316,7 @@ export default function AboutPage() {
       <section className="bg-gray-50 px-4 py-20 sm:px-6 lg:py-24">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto mb-14 max-w-2xl text-center">
-            <span className="text-sm font-bold uppercase tracking-widest text-red-600">
+            <span className="text-sm font-bold tracking-widest text-red-600 uppercase">
               Why MentorLagbe
             </span>
             <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl">
@@ -333,14 +324,14 @@ export default function AboutPage() {
               <span className="block text-red-600">Better Learning</span>
             </h2>
             <p className="mt-4 leading-7 text-gray-500">
-              Discover the features that make managing tuition
-              and finding educational guidance easier.
+              Discover the features that make managing tuition and finding
+              educational guidance easier.
             </p>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => {
-              const Icon = feature.icon;
+              const Icon = feature.icon
 
               return (
                 <div
@@ -356,7 +347,7 @@ export default function AboutPage() {
                     {feature.description}
                   </p>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
@@ -366,15 +357,15 @@ export default function AboutPage() {
       <section className="px-4 py-20 sm:px-6 lg:py-24">
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto mb-14 max-w-2xl text-center">
-            <span className="text-sm font-bold uppercase tracking-widest text-red-600">
+            <span className="text-sm font-bold tracking-widest text-red-600 uppercase">
               Our Community
             </span>
             <h2 className="mt-4 text-3xl font-extrabold sm:text-4xl">
               Made for <span className="text-red-600">Both Sides</span>
             </h2>
             <p className="mt-4 leading-7 text-gray-500">
-              MentorLagbe brings students and tutors together
-              in one connected educational ecosystem.
+              MentorLagbe brings students and tutors together in one connected
+              educational ecosystem.
             </p>
           </div>
 
@@ -386,16 +377,16 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="p-8">
-                <span className="text-xs font-bold uppercase tracking-widest text-red-600">
+                <span className="text-xs font-bold tracking-widest text-red-600 uppercase">
                   For Students
                 </span>
                 <h3 className="mt-3 text-2xl font-extrabold">
                   Find Your Ideal Tutor
                 </h3>
                 <p className="mt-4 leading-7 text-gray-500">
-                  Browse tuition listings, explore subjects,
-                  compare learning opportunities, apply for
-                  tuition, and manage your applications easily.
+                  Browse tuition listings, explore subjects, compare learning
+                  opportunities, apply for tuition, and manage your applications
+                  easily.
                 </p>
                 <Link
                   href="/tuitions"
@@ -413,16 +404,16 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="p-8">
-                <span className="text-xs font-bold uppercase tracking-widest text-red-600">
+                <span className="text-xs font-bold tracking-widest text-red-600 uppercase">
                   For Tutors
                 </span>
                 <h3 className="mt-3 text-2xl font-extrabold">
                   Share Your Knowledge
                 </h3>
                 <p className="mt-4 leading-7 text-gray-500">
-                  Create tuition posts, showcase your expertise,
-                  receive student applications, and manage your
-                  teaching activities from one dashboard.
+                  Create tuition posts, showcase your expertise, receive student
+                  applications, and manage your teaching activities from one
+                  dashboard.
                 </p>
                 <Link
                   href="/sign-up?role=tutor"
@@ -439,25 +430,22 @@ export default function AboutPage() {
       {/* Final CTA */}
       <section className="px-4 pb-20 sm:px-6 lg:pb-24">
         <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[2rem] bg-red-600 px-7 py-16 text-center text-white shadow-2xl shadow-red-200 sm:px-12 lg:py-20">
-          <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full border-[35px] border-white/10" />
-          <div className="absolute -bottom-32 -right-10 h-80 w-80 rounded-full border-[45px] border-white/10" />
+          <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full border-[35px] border-white/10" />
+          <div className="absolute -right-10 -bottom-32 h-80 w-80 rounded-full border-[45px] border-white/10" />
 
           <div className="relative mx-auto max-w-3xl">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15">
               <Lightbulb size={34} />
             </div>
 
-            <h2 className="mt-7 text-3xl font-extrabold leading-tight sm:text-4xl lg:text-5xl">
+            <h2 className="mt-7 text-3xl leading-tight font-extrabold sm:text-4xl lg:text-5xl">
               Your Learning Journey
-              <span className="block text-red-100">
-                Starts Here.
-              </span>
+              <span className="block text-red-100">Starts Here.</span>
             </h2>
 
             <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-red-100 sm:text-base">
-              Join MentorLagbe today. Find the right tutor,
-              share your knowledge, and become part of a
-              growing learning community.
+              Join MentorLagbe today. Find the right tutor, share your
+              knowledge, and become part of a growing learning community.
             </p>
 
             <div className="mt-9 flex flex-wrap justify-center gap-4">
@@ -478,7 +466,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
     </main>
-  );
+  )
 }

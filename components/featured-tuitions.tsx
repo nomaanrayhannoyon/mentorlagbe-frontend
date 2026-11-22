@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react"
 
 import { TuitionCard } from "@/components/tuition-card"
 import { Badge } from "@/components/ui/badge"
-import type { Tuition } from "@/lib/tuitions"
+import type { Tuition } from "@/lib/types"
 
 type FeaturedTuitionsProps = {
   tuitions: Tuition[]
@@ -34,7 +34,7 @@ export function FeaturedTuitions({ tuitions }: FeaturedTuitionsProps) {
           </div>
 
           <Link
-            href="/tutors"
+            href="/tuitions"
             className="group/link inline-flex items-center gap-2 text-sm font-semibold text-burgundy-600 transition-colors hover:text-burgundy-700 dark:text-burgundy-400 dark:hover:text-burgundy-300"
           >
             Browse All Tuitions
@@ -52,7 +52,7 @@ export function FeaturedTuitions({ tuitions }: FeaturedTuitionsProps) {
         ) : (
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {tuitions.map((tuition) => (
-              <TuitionCard key={tuition.id} tuition={tuition} />
+              <TuitionCard key={tuition._id} tuition={tuition} />
             ))}
           </div>
         )}

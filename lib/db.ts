@@ -76,13 +76,11 @@ async function ensureIndexes(db: Db): Promise<void> {
     db
       .collection("tuitions")
       .createIndex({ status: 1, subject: 1, mode: 1, level: 1 }),
-    db
-      .collection("tuitions")
-      .createIndex({
-        title: "text",
-        description: "text",
-        subject: "text",
-      }),
+    db.collection("tuitions").createIndex({
+      title: "text",
+      description: "text",
+      subject: "text",
+    }),
     db
       .collection("tuitions")
       .createIndex({ status: 1, price: 1, createdAt: -1 }),
@@ -94,6 +92,8 @@ async function ensureIndexes(db: Db): Promise<void> {
     db.collection("payments").createIndex({ tuitionId: 1 }),
     db.collection("payments").createIndex({ studentId: 1 }),
     db.collection("payments").createIndex({ userId: 1 }),
-    db.collection("bookmarks").createIndex({ userId: 1, tuitionId: 1 }, { unique: true }),
+    db
+      .collection("bookmarks")
+      .createIndex({ userId: 1, tuitionId: 1 }, { unique: true }),
   ])
 }

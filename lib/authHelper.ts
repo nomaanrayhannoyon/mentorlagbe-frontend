@@ -54,9 +54,7 @@ export async function requireSession(): Promise<Session> {
 }
 
 /** Require one of the given roles, redirecting unauthorized users to /dashboard. */
-export async function requireRole(
-  allowed: Role | Role[]
-): Promise<Session> {
+export async function requireRole(allowed: Role | Role[]): Promise<Session> {
   const session = await requireSession()
   const roles = Array.isArray(allowed) ? allowed : [allowed]
   if (!roles.includes(session.user.role)) {

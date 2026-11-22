@@ -41,9 +41,7 @@ export async function uploadImage(file: File): Promise<string> {
 
   const url = data.data?.url ?? data.data?.display_url
   if (!url) {
-    throw new ImgbbError(
-      data.error?.message ?? "ImgBB returned no image URL."
-    )
+    throw new ImgbbError(data.error?.message ?? "ImgBB returned no image URL.")
   }
 
   return url

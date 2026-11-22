@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server"
-import {
-  getCollection,
-  Collections,
-  type Payment,
-} from "@/lib/collections"
+import { getCollection, Collections, type Payment } from "@/lib/collections"
 import { getApiSession } from "@/lib/authHelper"
 import { jsonError } from "@/lib/api"
 

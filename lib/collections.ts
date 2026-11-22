@@ -16,7 +16,8 @@ import { getDb } from "@/lib/db"
 export type Role = "student" | "tutor" | "admin"
 export type TuitionStatus = "pending" | "approved" | "rejected"
 export type TuitionMode = "online" | "in-person"
-export type ApplicationStatus = "pending" | "accepted" | "rejected" | "withdrawn"
+export type ApplicationStatus =
+  "pending" | "accepted" | "rejected" | "withdrawn"
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded"
 
 /** A tuition document as stored in Mongo. */
@@ -96,11 +97,7 @@ export async function getCollection<T extends Document = Document>(
 }
 
 export type CollectionName =
-  | "user"
-  | "tuitions"
-  | "applications"
-  | "payments"
-  | "bookmarks"
+  "user" | "tuitions" | "applications" | "payments" | "bookmarks"
 
 export const Collections = {
   users: "user",

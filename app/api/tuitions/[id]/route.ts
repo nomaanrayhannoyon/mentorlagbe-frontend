@@ -71,7 +71,8 @@ export async function PATCH(request: Request, context: RouteContext) {
   }
 
   const parsed = updateSchema.safeParse(body)
-  if (!parsed.success) return jsonError("Validation failed", 422, parsed.error.flatten())
+  if (!parsed.success)
+    return jsonError("Validation failed", 422, parsed.error.flatten())
 
   const { image, ...rest } = parsed.data
 

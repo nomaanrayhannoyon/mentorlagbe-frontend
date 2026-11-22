@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import {
-  getCollection,
-  Collections,
-  type Payment,
-} from "@/lib/collections"
+import { getCollection, Collections, type Payment } from "@/lib/collections"
 import { getStripe, PRICE_IDS, STRIPE_ENABLED } from "@/lib/stripe"
 import { requireApiRole } from "@/lib/authHelper"
 import { jsonError } from "@/lib/api"
@@ -49,8 +45,7 @@ export async function POST(request: Request) {
     return jsonError("Stripe price id not configured (STRIPE_PRICE_PRO)", 503)
   }
 
-  const origin =
-    process.env.BETTER_AUTH_URL ?? new URL(request.url).origin
+  const origin = process.env.BETTER_AUTH_URL ?? new URL(request.url).origin
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",

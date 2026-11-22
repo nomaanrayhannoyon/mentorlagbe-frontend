@@ -34,7 +34,9 @@ function isPublic(pathname: string) {
   return (
     PUBLIC_PATHS.some(
       (p) => p === pathname || (p !== "/" && pathname.startsWith(p + "/"))
-    ) || pathname.startsWith("/_next") || pathname.startsWith("/images")
+    ) ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/images")
   )
 }
 
@@ -59,10 +61,7 @@ export async function middleware(request: NextRequest) {
 
   if (!token) {
     if (pathname.startsWith("/api")) {
-      return NextResponse.json(
-        { error: "Unauthenticated" },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthenticated" }, { status: 401 })
     }
     const url = request.nextUrl.clone()
     url.pathname = "/sign-in"
@@ -75,7 +74,5 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   // Run on everything except static assets and the auth endpoints themselves.
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|images|api/auth).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|images|api/auth).*)"],
 }

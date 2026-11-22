@@ -14,7 +14,7 @@ const plans = [
       "Basic profile & search filters",
     ],
     button: "Get Started Free",
-    link: "https://mentorlagbe-client.vercel.app/sign-up",
+    link: "/sign-up",
     popular: false,
   },
   {
@@ -32,12 +32,12 @@ const plans = [
       "Premium support",
     ],
     button: "Upgrade to PRO",
-    link: "https://mentorlagbe-client.vercel.app/pricing",
+    link: "/pricing",
     popular: true,
   },
 ]
 
-export default function PricingSection() {
+export function PricingSection() {
   return (
     <section className="relative isolate overflow-hidden bg-burgundy-950 px-4 py-24 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute top-0 -left-40 -z-10 h-96 w-96 rounded-full bg-burgundy-500/20 blur-[120px]" />

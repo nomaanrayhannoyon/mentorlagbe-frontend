@@ -42,7 +42,7 @@ export function Hero() {
 
           {/* Search bar */}
           <form
-            action="/tutors"
+            action="/tuitions"
             className="flex w-full max-w-xl items-center gap-2 rounded-full border bg-background p-2 shadow-sm focus-within:ring-2 focus-within:ring-burgundy-500/40"
           >
             <label htmlFor="hero-search" className="sr-only">
@@ -63,7 +63,7 @@ export function Hero() {
           </form>
 
           <Link
-            href="/tutors"
+            href="/tuitions"
             className={cn(
               buttonVariants({ size: "lg", variant: "outline" }),
               "rounded-full border-burgundy-200 px-6 text-burgundy-700 hover:bg-burgundy-50 hover:text-burgundy-800 dark:border-burgundy-800 dark:text-burgundy-300 dark:hover:bg-burgundy-950/60"

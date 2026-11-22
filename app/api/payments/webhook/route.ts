@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server"
 import type Stripe from "stripe"
 import { getStripe } from "@/lib/stripe"
-import {
-  getCollection,
-  Collections,
-  type Payment,
-} from "@/lib/collections"
+import { getCollection, Collections, type Payment } from "@/lib/collections"
 
 /**
  * POST /api/payments/webhook

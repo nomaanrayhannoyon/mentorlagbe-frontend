@@ -1,9 +1,14 @@
+"use client"
 
-"use client";
-
-import { useState } from "react";
-import Link from "next/link";
-import { Check, GraduationCap, BookOpen, Sparkles, ArrowRight } from "lucide-react";
+import { useState } from "react"
+import Link from "next/link"
+import {
+  Check,
+  GraduationCap,
+  BookOpen,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react"
 
 const plans = {
   student: [
@@ -58,21 +63,20 @@ const plans = {
       ],
     },
   ],
-};
+}
 
 export default function PricingPage() {
-  const [activeTab, setActiveTab] = useState<"student" | "tutor">("student");
+  const [activeTab, setActiveTab] = useState<"student" | "tutor">("student")
 
-  const currentPlans = plans[activeTab];
+  const currentPlans = plans[activeTab]
 
   return (
     <main className="min-h-screen bg-white px-4 py-16 text-gray-900 sm:px-6 lg:py-24">
-
       {/* Heading */}
       <section className="mx-auto max-w-3xl text-center">
         <span className="inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-2 text-sm font-semibold text-red-600">
           <Sparkles size={16} />
-          Simple & Transparent Pricing
+          Simple &amp; Transparent Pricing
         </span>
 
         <h1 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
@@ -81,8 +85,8 @@ export default function PricingPage() {
         </h1>
 
         <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-gray-500 sm:text-lg">
-          Whether you are looking for the perfect tutor or growing your
-          teaching career, MentorLagbe has the right plan for you.
+          Whether you are looking for the perfect tutor or growing your teaching
+          career, MentorLagbe has the right plan for you.
         </p>
       </section>
 
@@ -120,11 +124,9 @@ export default function PricingPage() {
       </p>
 
       {/* Pricing Cards */}
-      <section
-        className="mx-auto mt-12 grid max-w-5xl gap-7 md:grid-cols-2"
-      >
+      <section className="mx-auto mt-12 grid max-w-5xl gap-7 md:grid-cols-2">
         {currentPlans.map((plan, index) => {
-          const isPro = index === 1;
+          const isPro = index === 1
 
           return (
             <div
@@ -149,9 +151,13 @@ export default function PricingPage() {
                   </p>
                 </div>
 
-                <div className={`rounded-xl p-3 ${
-                  isPro ? "bg-red-50 text-red-600" : "bg-gray-100 text-gray-700"
-                }`}>
+                <div
+                  className={`rounded-xl p-3 ${
+                    isPro
+                      ? "bg-red-50 text-red-600"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
                   {activeTab === "student" ? (
                     <GraduationCap size={26} />
                   ) : (
@@ -169,11 +175,14 @@ export default function PricingPage() {
 
               <div className="my-8 h-px bg-gray-100" />
 
-              <h3 className="mb-5 font-bold">What's included:</h3>
+              <h3 className="mb-5 font-bold">What&apos;s included:</h3>
 
               <ul className="flex-1 space-y-4">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3 text-sm text-gray-600">
+                  <li
+                    key={feature}
+                    className="flex items-start gap-3 text-sm text-gray-600"
+                  >
                     <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-50 text-red-600">
                       <Check size={13} strokeWidth={3} />
                     </span>
@@ -194,21 +203,18 @@ export default function PricingPage() {
                 <ArrowRight size={17} />
               </Link>
             </div>
-          );
+          )
         })}
       </section>
 
       {/* Bottom Note */}
       <section className="mx-auto mt-16 max-w-2xl text-center">
-        <h3 className="text-xl font-bold">
-          Still have questions?
-        </h3>
+        <h3 className="text-xl font-bold">Still have questions?</h3>
         <p className="mt-2 text-sm leading-6 text-gray-500">
-          Choose a plan that fits your needs. You can upgrade to Pro
-          whenever you are ready.
+          Choose a plan that fits your needs. You can upgrade to Pro whenever
+          you are ready.
         </p>
       </section>
-
     </main>
-  );
+  )
 }

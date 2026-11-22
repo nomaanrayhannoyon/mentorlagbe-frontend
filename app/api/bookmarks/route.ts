@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import {
-  getCollection,
-  Collections,
-  type Bookmark,
-} from "@/lib/collections"
+import { getCollection, Collections, type Bookmark } from "@/lib/collections"
 import { getApiSession } from "@/lib/authHelper"
 import { jsonError, toObjectId } from "@/lib/api"
 

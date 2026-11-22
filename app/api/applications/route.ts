@@ -65,7 +65,8 @@ export async function POST(request: Request) {
   }
 
   const parsed = createSchema.safeParse(body)
-  if (!parsed.success) return jsonError("Validation failed", 422, parsed.error.flatten())
+  if (!parsed.success)
+    return jsonError("Validation failed", 422, parsed.error.flatten())
 
   const { tuitionId, message } = parsed.data
   const tuitionObjectId = toObjectId(tuitionId)
@@ -102,7 +103,10 @@ export async function POST(request: Request) {
 
   const result = await col.insertOne(doc as Application)
   return NextResponse.json(
-    { insertedId: result.insertedId.toString(), application: { ...doc, _id: result.insertedId } },
+    {
+      insertedId: result.insertedId.toString(),
+      application: { ...doc, _id: result.insertedId },
+    },
     { status: 201 }
   )
 }

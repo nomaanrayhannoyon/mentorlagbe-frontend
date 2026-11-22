@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator"
 
 const quickLinks = [
   { href: "/", label: "Home" },
-  { href: "/tutors", label: "Find Tutors" },
+  { href: "/tuitions", label: "Find Tuitions" },
   { href: "/pricing", label: "Pricing" },
   { href: "/about", label: "About Us" },
 ]

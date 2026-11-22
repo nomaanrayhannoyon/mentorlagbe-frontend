@@ -2,11 +2,7 @@ import { NextResponse } from "next/server"
 import { ObjectId } from "mongodb"
 import { z } from "zod"
 
-export function jsonError(
-  message: string,
-  status = 400,
-  details?: unknown
-) {
+export function jsonError(message: string, status = 400, details?: unknown) {
   return NextResponse.json(
     details ? { error: message, details } : { error: message },
     { status }

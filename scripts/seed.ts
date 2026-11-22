@@ -28,16 +28,43 @@ type SeedUser = {
 }
 
 const seedUsers: SeedUser[] = [
-  { name: "Admin One", email: "admin1@example.com", password: "Password123!", role: "admin" },
-  { name: "Tutor A", email: "tutora@example.com", password: "Password123!", role: "tutor" },
-  { name: "Tutor B", email: "tutorb@example.com", password: "Password123!", role: "tutor" },
-  { name: "Student X", email: "studentx@example.com", password: "Password123!", role: "student" },
-  { name: "Student Y", email: "studenty@example.com", password: "Password123!", role: "student" },
+  {
+    name: "Admin One",
+    email: "admin1@example.com",
+    password: "Password123!",
+    role: "admin",
+  },
+  {
+    name: "Tutor A",
+    email: "tutora@example.com",
+    password: "Password123!",
+    role: "tutor",
+  },
+  {
+    name: "Tutor B",
+    email: "tutorb@example.com",
+    password: "Password123!",
+    role: "tutor",
+  },
+  {
+    name: "Student X",
+    email: "studentx@example.com",
+    password: "Password123!",
+    role: "student",
+  },
+  {
+    name: "Student Y",
+    email: "studenty@example.com",
+    password: "Password123!",
+    role: "student",
+  },
 ]
 
 async function upsertUser(user: SeedUser) {
   const db = await getDb()
-  const existing = await db.collection(Collections.users).findOne({ email: user.email })
+  const existing = await db
+    .collection(Collections.users)
+    .findOne({ email: user.email })
   if (existing) return existing._id.toString()
 
   // Use better-auth's sign-up so the password is hashed and the account
@@ -62,7 +89,9 @@ async function upsertUser(user: SeedUser) {
     // If sign-up fails (e.g. already exists), fall back to the lookup below.
   }
 
-  const doc = await db.collection(Collections.users).findOne({ email: user.email })
+  const doc = await db
+    .collection(Collections.users)
+    .findOne({ email: user.email })
   return doc?._id.toString() ?? new ObjectId().toString()
 }
 
@@ -81,13 +110,33 @@ async function main() {
   const tutorBId = userIds.get("tutorb@example.com")!
 
   console.log("Seeding tuitions…")
-  const subjects: Array<{ subject: string; mode: TuitionMode; level: string; location?: string }> = [
-    { subject: "Mathematics", mode: "in-person", level: "Class 9", location: "Dhanmondi, Dhaka" },
+  const subjects: Array<{
+    subject: string
+    mode: TuitionMode
+    level: string
+    location?: string
+  }> = [
+    {
+      subject: "Mathematics",
+      mode: "in-person",
+      level: "Class 9",
+      location: "Dhanmondi, Dhaka",
+    },
     { subject: "Physics", mode: "online", level: "HSC" },
-    { subject: "Chemistry", mode: "in-person", level: "Class 10", location: "Mirpur, Dhaka" },
+    {
+      subject: "Chemistry",
+      mode: "in-person",
+      level: "Class 10",
+      location: "Mirpur, Dhaka",
+    },
     { subject: "English", mode: "online", level: "SSC" },
     { subject: "Programming", mode: "online", level: "University" },
-    { subject: "Biology", mode: "in-person", level: "HSC", location: "Uttara, Dhaka" },
+    {
+      subject: "Biology",
+      mode: "in-person",
+      level: "HSC",
+      location: "Uttara, Dhaka",
+    },
   ]
 
   for (let i = 0; i < subjects.length; i++) {

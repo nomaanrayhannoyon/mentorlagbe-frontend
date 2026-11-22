@@ -67,7 +67,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     const tuitionObjectId = toObjectId(application.tuitionId)
     if (!tuitionObjectId) return jsonError("Corrupt application", 500)
     const tuition = await tuitionsCol.findOne({ _id: tuitionObjectId })
-    if (!tuition || tuition.tutorId !== userId) return jsonError("Forbidden", 403)
+    if (!tuition || tuition.tutorId !== userId)
+      return jsonError("Forbidden", 403)
     if (application.status !== "pending") {
       return jsonError("Application is no longer pending", 400)
     }

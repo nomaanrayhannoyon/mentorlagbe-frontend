@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
-import {
-  getCollection,
-  Collections,
-  type Tuition,
-} from "@/lib/collections"
+import { getCollection, Collections, type Tuition } from "@/lib/collections"
 import { requireApiRole } from "@/lib/authHelper"
 
 /**
@@ -145,8 +141,17 @@ export async function POST(request: Request) {
     )
   }
 
-  const { title, description, subject, level, mode, location, price, schedule, image } =
-    parsed.data
+  const {
+    title,
+    description,
+    subject,
+    level,
+    mode,
+    location,
+    price,
+    schedule,
+    image,
+  } = parsed.data
 
   if (mode === "in-person" && !location) {
     return NextResponse.json(
@@ -178,7 +183,10 @@ export async function POST(request: Request) {
   const result = await col.insertOne(tuition as Tuition)
 
   return NextResponse.json(
-    { insertedId: result.insertedId.toString(), tuition: { ...tuition, _id: result.insertedId } },
+    {
+      insertedId: result.insertedId.toString(),
+      tuition: { ...tuition, _id: result.insertedId },
+    },
     { status: 201 }
   )
 }
