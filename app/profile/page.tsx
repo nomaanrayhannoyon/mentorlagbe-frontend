@@ -9,6 +9,8 @@ import {
 } from "react"
 import Link from "next/link"
 import {
+  Camera,
+  Crown,
   FileText,
   Loader2,
   Mail,
@@ -20,6 +22,8 @@ import {
 import type { LucideIcon } from "lucide-react"
 
 import { buttonVariants } from "@/components/ui/button"
+import { apiFetch, ApiError } from "@/lib/api-client"
+import { toast } from "sonner"
 import { authClient, type AuthUser } from "@/lib/auth-client"
 import { cn } from "cn"
 
@@ -76,9 +80,50 @@ export default function UpdateProfilePage() {
   const [phone, setPhone] = useState("")
   const [bio, setBio] = useState("")
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const populatedRef = useRef(false)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
+
+  const avatarUrl = (data?.user as AuthUser | undefined)?.image ?? ""
+  const plan = (data?.user as AuthUser | undefined)?.plan ?? "free"
+
+  const handleAvatarChange = async (file: File | undefined) => {
+    if (!file) return
+    if (!/^image\//.test(file.type)) {
+      toast.error("Please choose an image file.")
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be smaller than 5MB.")
+      return
+    }
+    setUploading(true)
+    try {
+      const form = new FormData()
+      form.append("image", file)
+      const res = await apiFetch<{ url: string }>("/api/upload", {
+        method: "POST",
+        body: form,
+      })
+      const result = await authClient.updateUser({
+        image: res.url,
+      } as Parameters<typeof authClient.updateUser>[0])
+      if (result.error) {
+        toast.error(result.error.message || "Could not save profile photo.")
+        return
+      }
+      toast.success("Profile photo updated.")
+      void refetch()
+    } catch (err) {
+      toast.error(
+        err instanceof ApiError ? err.message : "Image upload failed."
+      )
+    } finally {
+      setUploading(false)
+    }
+  }
 
   // Fill the form from the session once it arrives. The ref keeps later
   // session refreshes from wiping in-progress edits.
@@ -227,6 +272,64 @@ export default function UpdateProfilePage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5 px-7 py-8 sm:px-9">
+            {/* Profile photo + plan badge */}
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={uploading}
+                className="group relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 text-gray-400 transition hover:border-red-400 dark:border-white/10 dark:bg-white/5"
+                aria-label="Upload profile photo"
+              >
+                {avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={avatarUrl}
+                    alt="Profile"
+                    className="size-full object-cover"
+                  />
+                ) : (
+                  <User size={28} />
+                )}
+                <span className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 transition group-hover:opacity-100">
+                  {uploading ? (
+                    <Loader2 className="size-5 animate-spin" />
+                  ) : (
+                    <Camera className="size-5" />
+                  )}
+                </span>
+              </button>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  void handleAvatarChange(e.target.files?.[0])
+                  e.target.value = ""
+                }}
+              />
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                  Profile photo
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  JPG, PNG or GIF. Max 5MB.
+                </p>
+                <span
+                  className={cn(
+                    "mt-2 inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                    plan === "pro"
+                      ? "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
+                      : "bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300"
+                  )}
+                >
+                  {plan === "pro" && <Crown className="size-3" />}
+                  {plan === "pro" ? "Pro plan" : "Free plan"}
+                </span>
+              </div>
+            </div>
+
             <Field id="profile-name" label="Full Name" icon={User}>
               <input
                 id="profile-name"
