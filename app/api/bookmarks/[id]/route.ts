@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server"
-import { getCollection, Collections, type Bookmark } from "@/lib/collections"
+import {
+  getCollection,
+  Collections,
+  type UserDocument,
+} from "@/lib/collections"
 import { getApiSession } from "@/lib/authHelper"
 import { jsonError, toObjectId } from "@/lib/api"
 
@@ -8,6 +12,9 @@ type RouteContext = { params: Promise<{ id: string }> }
 /**
  * DELETE /api/bookmarks/[id]
  * Unsave a tuition. `id` is the tuitionId.
+ *
+ * Bookmarks live on the user document (`savedTuitions: string[]`), so this
+ * pulls the id from the array rather than touching a separate collection.
  */
 export async function DELETE(_request: Request, context: RouteContext) {
   const auth = await getApiSession()
@@ -16,13 +23,16 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const { id } = await context.params
   if (!toObjectId(id)) return jsonError("Invalid tuitionId", 400)
 
-  const col = await getCollection<Bookmark>(Collections.bookmarks)
-  const result = await col.deleteOne({
-    userId: auth.session.user.id,
-    tuitionId: id,
-  })
+  const userObjectId = toObjectId(auth.session.user.id)
+  if (!userObjectId) return jsonError("Invalid user", 400)
 
-  if (result.deletedCount === 0) {
+  const col = await getCollection<UserDocument>(Collections.users)
+  const result = await col.updateOne(
+    { _id: userObjectId },
+    { $pull: { savedTuitions: id } }
+  )
+
+  if (result.modifiedCount === 0) {
     return jsonError("Bookmark not found", 404)
   }
   return NextResponse.json({ ok: true })
