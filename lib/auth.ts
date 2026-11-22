@@ -22,6 +22,8 @@ export const auth = betterAuth({
   database: mongodbAdapter(db, {
     // `client` enables multi-document transactions (Atlas replica set).
     client,
+    // Assignment requires the collection be named `users` (plural).
+    usePlural: true,
   }),
 
   emailAndPassword: {
@@ -37,6 +39,13 @@ export const auth = betterAuth({
         required: false,
         defaultValue: "student",
         input: true,
+      },
+      plan: {
+        type: "string",
+        required: false,
+        defaultValue: "free",
+        // Plan is only ever changed by the Stripe webhook, never by the client.
+        input: false,
       },
       phone: {
         type: "string",

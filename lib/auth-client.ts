@@ -18,6 +18,7 @@ export const authClient = createAuthClient({
     inferAdditionalFields({
       user: {
         role: { type: "string", required: false, input: true },
+        plan: { type: "string", required: false, input: false },
         phone: { type: "string", required: false, input: true },
         bio: { type: "string", required: false, input: true },
       },
@@ -35,6 +36,7 @@ export type AuthUser = {
   image?: string | null
   emailVerified?: boolean
   role?: "student" | "tutor" | "admin"
+  plan?: "free" | "pro"
   phone?: string
   bio?: string
 }
