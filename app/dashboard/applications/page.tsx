@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation"
 import { requireRole } from "@/lib/authHelper"
 import { ApplicationsList } from "@/components/dashboard/applications-list"
 
@@ -6,8 +7,11 @@ export const metadata = { title: "Applications" }
 export default async function ApplicationsPage() {
   const session = await requireRole(["student", "tutor", "admin"])
 
-  // Admins get the student view (their own) for now; the full admin view
-  // lives under /dashboard/admin.
+  // Admins manage all applications from the admin area.
+  if (session.user.role === "admin") {
+    redirect("/dashboard/admin/applications")
+  }
+
   const mode = session.user.role === "tutor" ? "tutor" : "student"
 
   return (

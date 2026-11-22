@@ -6,7 +6,7 @@ import Link from "next/link"
 import { toast } from "sonner"
 
 import { apiFetch, ApiError } from "@/lib/api-client"
-import type { Application, Tuition } from "@/lib/types"
+import type { Application } from "@/lib/types"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -28,11 +28,28 @@ const statusLabel: Record<Application["status"], string> = {
   withdrawn: "Withdrawn",
 }
 
-type Mode = "student" | "tutor"
+type Mode = "student" | "tutor" | "admin"
+
+const COPY: Record<Mode, { title: string; empty: string; hint: string }> = {
+  student: {
+    title: "My applications",
+    empty: "Browse tuitions and apply to ones you like.",
+    hint: "Track the status of tuitions you have applied to.",
+  },
+  tutor: {
+    title: "Applications to your tuitions",
+    empty: "Applications from students will appear here.",
+    hint: "Review and manage students who applied to your tuitions.",
+  },
+  admin: {
+    title: "All applications",
+    empty: "No applications have been submitted yet.",
+    hint: "Review and moderate every application on the platform.",
+  },
+}
 
 export function ApplicationsList({ mode }: { mode: Mode }) {
   const [apps, setApps] = useState<Application[]>([])
-  const [tuitions, setTuitions] = useState<Record<string, Tuition>>({})
   const [loading, setLoading] = useState(true)
   const [busyId, setBusyId] = useState<string | null>(null)
 
@@ -41,14 +58,6 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
     try {
       const data = await apiFetch<{ items: Application[] }>("/api/applications")
       setApps(data.items)
-
-      // If tutor, fetch tuitions to render titles.
-      if (mode === "tutor" && data.items.length > 0) {
-        const mine = await apiFetch<{ items: Tuition[] }>("/api/tuitions/mine")
-        const map: Record<string, Tuition> = {}
-        for (const t of mine.items) map[t._id] = t
-        setTuitions(map)
-      }
     } catch (err) {
       toast.error(
         err instanceof ApiError ? err.message : "Could not load applications."
@@ -56,7 +65,7 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
     } finally {
       setLoading(false)
     }
-  }, [mode])
+  }, [])
 
   useEffect(() => {
     void load()
@@ -100,11 +109,7 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
       <Card className="flex flex-col items-center gap-3 p-12 text-center">
         <ClipboardList className="size-10 text-muted-foreground" />
         <h3 className="text-lg font-semibold">No applications yet</h3>
-        <p className="text-sm text-muted-foreground">
-          {mode === "student"
-            ? "Browse tuitions and apply to ones you like."
-            : "Applications from students will appear here."}
-        </p>
+        <p className="text-sm text-muted-foreground">{COPY[mode].empty}</p>
         {mode === "student" && (
           <Link href="/tuitions" className="mt-2">
             <Button variant="outline">Browse tuitions</Button>
@@ -117,7 +122,6 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
   return (
     <div className="space-y-4">
       {apps.map((app) => {
-        const tuition = tuitions[app.tuitionId]
         const isPending = app.status === "pending"
         return (
           <Card key={app._id} className="p-5">
@@ -125,7 +129,7 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
               <div className="min-w-0 space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold">
-                    {tuition?.title ?? "Tuition"}
+                    {app.tuition?.title ?? "Tuition"}
                   </h3>
                   <Badge variant={statusVariant[app.status]}>
                     {statusLabel[app.status]}
@@ -139,10 +143,25 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
                     </span>
                   </p>
                 )}
-                {mode === "student" && tuition && (
+                {mode === "admin" && (
                   <p className="text-sm text-muted-foreground">
-                    Subject: {tuition.subject} · Level: {tuition.level} · ৳
-                    {tuition.price}
+                    Applicant:{" "}
+                    <span className="font-medium text-foreground">
+                      {app.studentName ?? "Student"}
+                    </span>
+                    {app.tuition && (
+                      <>
+                        {" · "}
+                        {app.tuition.subject} · {app.tuition.level} · ৳
+                        {app.tuition.price}
+                      </>
+                    )}
+                  </p>
+                )}
+                {mode === "student" && app.tuition && (
+                  <p className="text-sm text-muted-foreground">
+                    Subject: {app.tuition.subject} · Level: {app.tuition.level}{" "}
+                    · ৳{app.tuition.price}
                   </p>
                 )}
                 {app.message && (
@@ -157,7 +176,7 @@ export function ApplicationsList({ mode }: { mode: Mode }) {
               </div>
 
               <div className="flex shrink-0 flex-wrap gap-2">
-                {mode === "tutor" && isPending && (
+                {(mode === "tutor" || mode === "admin") && isPending && (
                   <>
                     <Button
                       size="sm"
