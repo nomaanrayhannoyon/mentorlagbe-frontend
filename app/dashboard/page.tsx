@@ -8,6 +8,7 @@ import {
   Plus,
   Search,
   TrendingUp,
+  CreditCard,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
@@ -111,13 +112,18 @@ export default async function DashboardPage() {
     const tuitions = await getCollection(Collections.tuitions)
     const users = await getCollection(Collections.users)
     const apps = await getCollection(Collections.applications)
-    const [pendingTuitions, totalUsers, totalTuitions, totalApps] =
+    const payments = await getCollection(Collections.payments)
+    const [pendingTuitions, totalUsers, totalApps, paidPayments] =
       await Promise.all([
         tuitions.countDocuments({ status: "pending" }),
         users.countDocuments({}),
-        tuitions.countDocuments({}),
         apps.countDocuments({}),
+        payments.find({ status: "paid" }).project({ amount: 1 }).toArray(),
       ])
+    const totalRevenue = paidPayments.reduce(
+      (sum, p) => sum + (p.amount ?? 0),
+      0
+    )
     stats = [
       {
         label: "Pending review",
@@ -131,8 +137,18 @@ export default async function DashboardPage() {
         icon: Users,
         href: "/dashboard/admin/users",
       },
-      { label: "Total tuitions", value: totalTuitions, icon: GraduationCap },
-      { label: "Total applications", value: totalApps, icon: ClipboardList },
+      {
+        label: "Total applications",
+        value: totalApps,
+        icon: ClipboardList,
+        href: "/dashboard/admin/applications",
+      },
+      {
+        label: "Revenue collected",
+        value: `$${totalRevenue.toFixed(2)}`,
+        icon: CreditCard,
+        href: "/dashboard/payments",
+      },
     ]
   }
 
