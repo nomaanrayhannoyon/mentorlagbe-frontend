@@ -31,11 +31,13 @@ export function DashboardUserCard({
   name,
   email,
   role,
+  plan,
   image,
 }: {
   name: string
   email: string
   role: Role
+  plan?: "free" | "pro"
   image?: string | null
 }) {
   return (
@@ -58,9 +60,23 @@ export function DashboardUserCard({
           <p className="truncate text-xs text-muted-foreground">{email}</p>
         </div>
       </div>
-      <Badge variant="outline" className={`mt-3 w-fit ${roleBadgeClass[role]}`}>
-        {roleLabel[role]}
-      </Badge>
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        <Badge variant="outline" className={`w-fit ${roleBadgeClass[role]}`}>
+          {roleLabel[role]}
+        </Badge>
+        {plan && (
+          <Badge
+            variant="outline"
+            className={
+              plan === "pro"
+                ? "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                : "border-gray-300/50 bg-gray-500/10 text-gray-600 dark:text-gray-400"
+            }
+          >
+            {plan === "pro" ? "Pro" : "Free"}
+          </Badge>
+        )}
+      </div>
     </div>
   )
 }

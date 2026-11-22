@@ -60,6 +60,7 @@ const NAV_BY_ROLE: Record<Role, NavItem[]> = {
       icon: ShieldCheck,
     },
     { href: "/dashboard/admin/users", label: "Users", icon: Users },
+    { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
     { href: "/profile", label: "Profile", icon: Settings },
   ],
 }
@@ -85,6 +86,7 @@ export default async function DashboardLayout({
               name={session.user.name}
               email={session.user.email}
               role={role}
+              plan={session.user.plan}
               image={session.user.image}
             />
             <DashboardNav items={nav} />

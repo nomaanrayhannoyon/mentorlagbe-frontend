@@ -13,6 +13,7 @@ import type { LucideIcon } from "lucide-react"
 
 import { requireRole } from "@/lib/authHelper"
 import { getCollection, Collections } from "@/lib/collections"
+import { toObjectId } from "@/lib/api"
 import { Card } from "@/components/ui/card"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -51,11 +52,15 @@ export default async function DashboardPage() {
 
   if (role === "student") {
     const apps = await getCollection(Collections.applications)
-    const bms = await getCollection(Collections.bookmarks)
-    const [appCount, bmCount] = await Promise.all([
+    const users = await getCollection(Collections.users)
+    const [appCount, me] = await Promise.all([
       apps.countDocuments({ studentId: userId }),
-      bms.countDocuments({ userId }),
+      users.findOne(
+        { _id: toObjectId(userId)! },
+        { projection: { savedTuitions: 1 } }
+      ),
     ])
+    const bmCount = me?.savedTuitions?.length ?? 0
     stats = [
       {
         label: "My applications",

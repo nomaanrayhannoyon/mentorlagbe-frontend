@@ -11,7 +11,7 @@ import {
 } from "lucide-react"
 
 import { getCollection, Collections, type Tuition } from "@/lib/collections"
-import { getSession } from "@/lib/authHelper"
+import { verifyToken } from "@/lib/authHelper"
 import { buttonVariants } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
@@ -39,8 +39,8 @@ export default async function TuitionDetailPage({
   const tuition = await col.findOne({ _id: objectId })
   if (!tuition) notFound()
 
-  // Only approved tuitions are publicly visible.
-  if (tuition.status !== "approved") {
+  // Only approved, still-active tuitions are publicly visible.
+  if (tuition.status !== "approved" || tuition.isActive === false) {
     notFound()
   }
 
@@ -49,7 +49,7 @@ export default async function TuitionDetailPage({
   try {
     const tutorObjectId = new ObjectId(tuition.tutorId)
     const users = await getCollection<Record<string, unknown>>(
-      Collections.users as "user"
+      Collections.users
     )
     tutor = (await users.findOne({
       _id: tutorObjectId,
@@ -58,7 +58,7 @@ export default async function TuitionDetailPage({
     tutor = null
   }
 
-  const session = await getSession()
+  const session = await verifyToken()
   const userId = session?.user.id
   const role = session?.user.role
   const isOwner = userId === tuition.tutorId
