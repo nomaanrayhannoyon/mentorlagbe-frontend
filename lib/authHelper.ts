@@ -77,11 +77,12 @@ export async function requireSession(): Promise<Session> {
 
 /**
  * Verify the token AND that the user holds one of the allowed roles.
- * Redirects unauthorized users to their dashboard.
+ * Redirects unauthorized users to their own role-specific dashboard so they
+ * can never view another role's dashboard.
  */
 export async function requireRole(allowed: Role | Role[]): Promise<Session> {
   const session = await requireSession()
-  if (!hasRole(session, allowed)) redirect("/dashboard")
+  if (!hasRole(session, allowed)) redirect(`/dashboard/${session.user.role}`)
   return session
 }
 
