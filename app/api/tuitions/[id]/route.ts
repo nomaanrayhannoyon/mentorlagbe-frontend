@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getCollection, Collections, type Tuition } from "@/lib/collections"
-import { requireApiRole } from "@/lib/authHelper"
+import { verifyTutor, requireApiRole } from "@/lib/authHelper"
 import { toObjectId, jsonError } from "@/lib/api"
 
 type RouteContext = { params: Promise<{ id: string }> }
@@ -42,14 +42,19 @@ const updateSchema = z.object({
   price: z.coerce.number().min(0).max(100000).optional(),
   schedule: z.string().trim().max(160).optional(),
   image: z.string().url().optional().or(z.literal("")),
+  /** Tutors can open/close their tuition for new applications. */
+  isActive: z.boolean().optional(),
 })
 
 /**
  * PATCH /api/tuitions/[id]
- * Tutor-only: update own tuition. Re-submits to `pending` for re-approval.
+ * Tutor-only: update own tuition.
+ *
+ * Editing content sends the tuition back to `pending` for re-approval.
+ * Toggling only `isActive` (open/close) does NOT trigger re-moderation.
  */
 export async function PATCH(request: Request, context: RouteContext) {
-  const auth = await requireApiRole("tutor")
+  const auth = await verifyTutor()
   if (!auth.ok) return jsonError(auth.error, auth.status)
 
   const { id } = await context.params
@@ -74,15 +79,20 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (!parsed.success)
     return jsonError("Validation failed", 422, parsed.error.flatten())
 
-  const { image, ...rest } = parsed.data
+  const { image, isActive, ...rest } = parsed.data
 
   const update: Partial<Tuition> & { updatedAt: Date } = {
-    ...rest,
     ...(image !== undefined ? { image: image || undefined } : {}),
+    ...(isActive !== undefined ? { isActive } : {}),
     updatedAt: new Date(),
-    // Edits must be re-moderated.
-    status: "pending",
-    moderationNote: undefined,
+  }
+
+  // Content edits require re-moderation; a bare open/close toggle does not.
+  const hasContentEdits = Object.keys(rest).length > 0 || image !== undefined
+  if (hasContentEdits) {
+    Object.assign(update, rest)
+    update.status = "pending"
+    update.moderationNote = undefined
   }
 
   await col.updateOne({ _id: objectId }, { $set: update })

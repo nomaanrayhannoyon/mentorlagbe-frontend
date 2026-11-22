@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getCollection, Collections, type Tuition } from "@/lib/collections"
-import { requireApiRole } from "@/lib/authHelper"
+import { verifyTutor } from "@/lib/authHelper"
+import { canPostTuition, getPlanLimits, planLimitMessage } from "@/lib/plans"
 
 /**
  * GET /api/tuitions
@@ -52,7 +53,10 @@ export async function GET(request: Request) {
   const col = await getCollection<Tuition>(Collections.tuitions)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filter: Record<string, any> = { status: "approved" }
+  const filter: Record<string, any> = {
+    status: "approved",
+    isActive: true,
+  }
 
   if (subject) filter.subject = subject
   if (mode) filter.mode = mode
@@ -121,7 +125,7 @@ const createSchema = z.object({
 })
 
 export async function POST(request: Request) {
-  const auth = await requireApiRole("tutor")
+  const auth = await verifyTutor()
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status })
   }
@@ -161,6 +165,26 @@ export async function POST(request: Request) {
   }
 
   const col = await getCollection<Tuition>(Collections.tuitions)
+
+  // Enforce the free-plan tuition post limit on the server. The plan comes
+  // from the user document (set only by the Stripe webhook), never the client.
+  const plan = auth.session.user.plan ?? "free"
+  if (
+    !canPostTuition(
+      plan,
+      await col.countDocuments({ tutorId: auth.session.user.id })
+    )
+  ) {
+    return NextResponse.json(
+      {
+        error: planLimitMessage("posts", plan),
+        code: "PLAN_LIMIT_REACHED",
+        limit: getPlanLimits(plan).maxTuitionPosts,
+      },
+      { status: 403 }
+    )
+  }
+
   const now = new Date()
 
   const tuition: Omit<Tuition, "_id"> = {
@@ -176,6 +200,7 @@ export async function POST(request: Request) {
     tutorId: auth.session.user.id,
     tutorName: auth.session.user.name,
     status: "pending",
+    isActive: true,
     createdAt: now,
     updatedAt: now,
   }
