@@ -68,8 +68,14 @@ export async function POST(request: Request) {
       planName,
       role,
     },
-    success_url: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${origin}/payment/cancel`,
+    // Subscription metadata is separate from session metadata. Without this,
+    // the customer.subscription.deleted webhook cannot identify which user to
+    // downgrade (sub.metadata.userId would be undefined).
+    subscription_data: {
+      metadata: { userId: auth.session.user.id },
+    },
+    success_url: `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${origin}/payment-cancelled`,
   })
 
   // Record a pending payment row so the webhook can reconcile it.

@@ -68,6 +68,10 @@ export async function POST(request: Request) {
             : null) ??
           session.id
         if (session.id) {
+          // Idempotency: ignore duplicate deliveries of a successful event.
+          const existing = await payCol.findOne({ stripeSessionId: session.id })
+          if (existing?.paymentStatus === "paid") break
+
           const email =
             (session.customer_details?.email as string | undefined) ??
             (session.customer_email as string | undefined)
