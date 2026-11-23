@@ -81,7 +81,7 @@ export async function DashboardOverview({ session }: { session: Session }) {
     const apps = await getCollection(Collections.applications)
     const [tutorTuitionCount, pendingCount, appCount] = await Promise.all([
       tuitions.countDocuments({ tutorId: userId }),
-      tuitions.countDocuments({ tutorId: userId, status: "pending" }),
+      tuitions.countDocuments({ tutorId: userId, approvalStatus: "pending" }),
       apps.countDocuments({
         tuitionId: {
           $in: (
@@ -115,10 +115,10 @@ export async function DashboardOverview({ session }: { session: Session }) {
     const payments = await getCollection(Collections.payments)
     const [pendingTuitions, totalUsers, totalApps, paidPayments] =
       await Promise.all([
-        tuitions.countDocuments({ status: "pending" }),
+        tuitions.countDocuments({ approvalStatus: "pending" }),
         users.countDocuments({}),
         apps.countDocuments({}),
-        payments.find({ status: "paid" }).project({ amount: 1 }).toArray(),
+        payments.find({ paymentStatus: "paid" }).project({ amount: 1 }).toArray(),
       ])
     const totalRevenue = paidPayments.reduce(
       (sum, p) => sum + (p.amount ?? 0),

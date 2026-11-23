@@ -72,7 +72,7 @@ export function ModerationList() {
     try {
       await apiFetch(`/api/admin/tuitions/${tuition._id}/review`, {
         method: "POST",
-        body: { status: nextStatus, moderationNote: note },
+        body: { approvalStatus: nextStatus, moderationNote: note },
       })
       toast.success(
         nextStatus === "approved" ? "Tuition approved." : "Tuition rejected."
