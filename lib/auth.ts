@@ -89,6 +89,23 @@ export const auth = betterAuth({
     },
   },
 
+  // Google sign-in must work for emails that already exist as password
+  // accounts. Because `requireEmailVerification` is disabled, every local
+  // account has `emailVerified: false`; with Better Auth's default
+  // `requireLocalEmailVerified: true`, Google OAuth silently fails with
+  // "account not linked" for those users. Google is a trusted IdP (it verifies
+  // email ownership), so link accounts by verified email.
+  // Trade-off: if email verification is later enabled, set
+  // `requireLocalEmailVerified: true` to prevent account-takeover via a
+  // pre-registered unverified account.
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google"],
+      requireLocalEmailVerified: false,
+    },
+  },
+
   // Google OAuth is only enabled when credentials are present, so the app
   // builds and runs cleanly without them (the "Continue with Google" buttons
   // surface a friendly error if clicked while unconfigured).
